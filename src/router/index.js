@@ -1,68 +1,100 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { useAuth } from "@/composables/useAuth";
 import DefaultLayout from "@/components/layout/DefaultLayout.vue";
 
 const routes = [
   {
     path: "/",
+    redirect: "/login",
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: () => import("@/pages/Login.vue"),
+    meta: { requiresGuest: true },
+  },
+  {
+    path: "/esqueci-senha",
+    name: "esqueci-senha",
+    component: () => import("@/pages/EsqueciSenha.vue"),
+    meta: { requiresGuest: true },
+  },
+  {
+    path: "/nova-senha",
+    name: "nova-senha",
+    component: () => import("@/pages/NovaSenha.vue"),
+    meta: { requiresGuest: true },
+  },
+  {
+    path: "/verificar-codigo",
+    name: "verificar-codigo",
+    component: () => import("@/pages/CodigoVerificacao.vue"),
+    meta: { requiresGuest: true },
+  },
+  {
+    path: "/dashboard",
     component: DefaultLayout,
+    meta: { requiresAuth: true },
     children: [
       {
         path: "",
-        redirect: "/dashboard"
-      },
-      {
-        path: "/dashboard",
         name: "dashboard",
         component: () => import("@/pages/Dashboard.vue"),
-        meta: { title: "Dashboard" }
+        meta: { title: "Dashboard" },
       },
       {
         path: "/produtos",
         name: "produtos",
         component: () => import("@/pages/Produtos.vue"),
-        meta: { title: "Produtos" }
+        meta: { title: "Produtos" },
       },
       {
         path: "/estoque",
         name: "estoque",
         component: () => import("@/pages/Estoque.vue"),
-        meta: { title: "Estoque" }
+        meta: { title: "Estoque" },
       },
       {
         path: "/checkout",
         name: "checkout",
         component: () => import("@/pages/Checkout.vue"),
-        meta: { title: "Checkout" }
+        meta: { title: "Checkout" },
       },
       {
         path: "/entregas",
         name: "entregas",
         component: () => import("@/pages/Entregas.vue"),
-        meta: { title: "Entregas" }
+        meta: { title: "Entregas" },
       },
       {
         path: "/notificacoes",
         name: "notificacoes",
         component: () => import("@/pages/Notificacoes.vue"),
-        meta: { title: "Notificações" }
-      }
-    ]
+        meta: { title: "Notificações" },
+      },
+    ],
   },
-  {
-    path: "/login",
-    component: () => import("@/pages/Login.vue")
-  },
-  {
-    path: "/esqueci-senha",
-    component: () => import("@/pages/EsqueciSenha.vue")
-  }
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 });
 
+router.beforeEach((to, from, next) => {
+  const { isAuthenticated } = useAuth();
 
+  if (to.meta.requiresAuth && !isAuthenticated.value) {
+    next("/login");
+    return;
+  }
+
+  if (to.meta.requiresGuest && isAuthenticated.value) {
+    next("/dashboard");
+    return;
+  }
+
+  next();
+});
 
 export default router;

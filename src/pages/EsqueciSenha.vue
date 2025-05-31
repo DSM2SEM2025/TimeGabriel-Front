@@ -47,8 +47,8 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { CubeIcon, MailIcon } from "@heroicons/vue/outline";
-import BaseInput from "@/components/ui/BaseInput.vue";
-import BaseButton from "@/components/ui/BaseButton.vue";
+import BaseInput from "@/components/ui/Login/BaseInput.vue";
+import BaseButton from "@/components/ui/Login/BaseButton.vue";
 
 const router = useRouter();
 const email = ref("");
@@ -61,7 +61,7 @@ const handleSubmit = async () => {
     isLoading.value = true;
     // Simulando chamada da API
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    router.push("/login");
+    router.push("/verificar-codigo"); 
   } catch (error) {
     console.error("Erro ao recuperar senha:", error);
   } finally {

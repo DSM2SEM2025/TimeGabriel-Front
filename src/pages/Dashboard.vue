@@ -61,8 +61,8 @@
 </template>
 
 <script setup>
-import SummaryCard from '../components/ui/SummaryCard.vue'
-import ActionCard from '../components/ui/ActionCard.vue'
+import SummaryCard from '../components/ui/Dashboard/SummaryCard.vue'
+import ActionCard from '../components/ui/Dashboard/ActionCard.vue'
 
 </script>
 

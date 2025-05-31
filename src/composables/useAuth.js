@@ -1,27 +1,43 @@
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+
+const user = ref(null);
+const isAuthenticated = ref(false);
+const isLoading = ref(false);
+const error = ref(null);
+
+const loadStoredAuth = () => {
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    user.value = JSON.parse(storedUser);
+    isAuthenticated.value = true;
+  }
+};
+
+loadStoredAuth();
 
 export function useAuth() {
-  const user = ref(null);
-  const isAuthenticated = ref(false);
-  const isLoading = ref(false);
-  const error = ref(null);
-  const router = useRouter();
-
   const login = async (email, password) => {
     isLoading.value = true;
     error.value = null;
 
     try {
-      // Simulando chamada da API
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Simulando validação de credenciais
+      if (email && password) {
+        // Simulando delay da API
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Simulando login bem-sucedido
-      user.value = { email };
-      isAuthenticated.value = true;
-      router.push("/");
+        // Armazena dados do usuário
+        const userData = { email, id: Date.now() };
+        localStorage.setItem("user", JSON.stringify(userData));
+
+        user.value = userData;
+        isAuthenticated.value = true;
+        return true;
+      } else {
+        throw new Error("Credenciais inválidas");
+      }
     } catch (e) {
-      error.value = "Credenciais inválidas";
+      error.value = e.message;
       throw e;
     } finally {
       isLoading.value = false;
@@ -31,7 +47,7 @@ export function useAuth() {
   const logout = () => {
     user.value = null;
     isAuthenticated.value = false;
-    router.push("/login");
+    localStorage.removeItem("user");
   };
 
   return {

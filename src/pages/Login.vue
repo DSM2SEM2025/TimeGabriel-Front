@@ -51,8 +51,8 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { CubeIcon, MailIcon, LockClosedIcon } from "@heroicons/vue/outline";
-import BaseInput from "@/components/ui/BaseInput.vue";
-import BaseButton from "@/components/ui/BaseButton.vue";
+import BaseInput from "@/components/ui/Login/BaseInput.vue";
+import BaseButton from "@/components/ui/Login/BaseButton.vue";
 import { useAuth } from "@/composables/useAuth";
 
 const router = useRouter();
