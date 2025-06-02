@@ -1,14 +1,13 @@
 <template>
   <div class="p-6">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <SummaryCard title="Total de Produtos" value="60" icon="📦" color="bg-blue-100" change="+3" />
-      <SummaryCard title="Produtos em Baixo estoque" value="10" icon="🔔" color="bg-yellow-100" change="-3" />
-      <SummaryCard title="Entregas Pendentes" value="15" icon="🚚" color="bg-orange-100" />
-      <SummaryCard title="Saída de Produtos" value="12" icon="📦" color="bg-green-100" />
+      <SummaryCard title="Total de Produtos" value="60" :icon="CubeIcon" color="bg-blue-100" change="+3" />
+      <SummaryCard title="Produtos em Baixo estoque" value="10" :icon="ExclamationIcon" color="bg-yellow-100" change="-3" />
+      <SummaryCard title="Entregas Pendentes" value="15" :icon="TruckIcon" color="bg-orange-100" />
+      <SummaryCard title="Saída de Produtos" value="12" :icon="ArrowUpIcon" color="bg-green-100" />
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-
       <div class="lg:col-span-2 bg-white p-4 rounded-2xl shadow">
         <h2 class="text-lg font-semibold mb-4">Atividade recente</h2>
         <ul class="text-sm divide-y">
@@ -32,38 +31,52 @@
       </div>
     </div>
 
-  
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <ActionCard
         title="Adicionar novo Produto"
-        description="Registrar Produto"
+        description="Registrar novo item no estoque"
         color="bg-purple-200"
-        route="/produtos"
-        icon="📦"
+        :icon="PlusIcon"
+        @click="navigateTo('/produtos')"
       />
       <ActionCard
         title="Atualizar Estoque"
-        description="Gerenciar Estoque"
+        description="Ajustar quantidades"
         color="bg-blue-200"
-        route="/estoque"
-        icon="📦"
+        :icon="PencilIcon"
+        @click="navigateTo('/estoque')"
       />
       <ActionCard
         title="Confirmar Entregas"
-        description="Ver Entregas"
+        description="Verificar entregas pendentes"
         color="bg-green-200"
-        route="/entregas"
-        icon="🚚"
+        :icon="TruckIcon"
+        @click="navigateTo('/entregas')"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-import SummaryCard from '../components/ui/Dashboard/SummaryCard.vue'
-import ActionCard from '../components/ui/Dashboard/ActionCard.vue'
+import { 
+  CubeIcon,
+  ExclamationIcon,
+  TruckIcon,
+  ArrowUpIcon,
+  PlusIcon,
+  PencilIcon
+} from "@heroicons/vue/outline";
+import { useRouter } from 'vue-router';
+import SummaryCard from '../components/ui/Dashboard/SummaryCard.vue';
+import ActionCard from '../components/ui/Dashboard/ActionCard.vue';
 
+const router = useRouter();
+
+const navigateTo = (path) => {
+  router.push(path);
+};
 </script>
 
 <style scoped>
+
 </style>
