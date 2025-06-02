@@ -1,17 +1,22 @@
 <template>
-  <router-link :to="route" class="block rounded-2xl p-6 shadow hover:shadow-md transition-all" :class="color">
-    <div class="text-4xl mb-2">{{ icon }}</div>
-    <h3 class="text-lg font-bold">{{ title }}</h3>
-    <p class="text-sm text-gray-700">{{ description }}</p>
-  </router-link>
+  <div 
+    :class="['p-4 rounded-2xl shadow cursor-pointer transition-all hover:shadow-md', color]"
+    @click="$emit('click')"
+  >
+    <div class="flex items-center mb-3">
+      <component :is="icon" class="h-6 w-6 mr-2" />
+      <h3 class="text-lg font-semibold">{{ title }}</h3>
+    </div>
+    <p class="text-sm text-gray-600">{{ description }}</p>
+  </div>
 </template>
 
 <script setup>
 defineProps({
   title: String,
   description: String,
-  route: String,
   color: String,
-  icon: String
-})
+  icon: Object
+});
+defineEmits(['click']);
 </script>
