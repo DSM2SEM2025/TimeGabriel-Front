@@ -1,6 +1,5 @@
 <template>
   <div class="p-6">
-    <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <SummaryCard title="Total de Produtos" value="60" icon="📦" color="bg-blue-100" change="+3" />
       <SummaryCard title="Produtos em Baixo estoque" value="10" icon="🔔" color="bg-yellow-100" change="-3" />
