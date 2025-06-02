@@ -1,4 +1,4 @@
-<template>Add commentMore actions
+<template>
   <div 
     :class="['p-4 rounded-2xl shadow cursor-pointer transition-all hover:shadow-md', color]"
     @click="$emit('click')"

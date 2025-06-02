@@ -18,5 +18,6 @@ defineProps({
   color: String,
   icon: Object
 });
+
 defineEmits(['click']);
 </script>
