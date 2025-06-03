@@ -1,9 +1,52 @@
 <template>
-  <div class="container mx-auto px-4">
-    <!-- Conteúdo do Checkout -->
+  <div class="checkout-page flex justify-between p-6">
+    <div class="w-3/4">
+      <ProductSearch @add-to-cart="addToCart" />
+      <ProductTable :products="filteredProducts" />
+    </div>
+    <CheckoutSummary
+      :cart="cart"
+      @remove="removeFromCart"
+      @finalize="finalizeCheckout"
+      @clear="clearCart"
+      @update-quantity="updateQuantity"
+    />
   </div>
 </template>
 
 <script setup>
-// A lógica do checkout 
+import { ref, computed } from 'vue'
+import ProductSearch from '@/components/ui/Checkout/ProductSearch.vue'
+import ProductTable from '@/components/ui/Checkout/ProductTable.vue'
+import CheckoutSummary from '@/components/ui/Checkout/CheckoutSummary.vue'
+
+const cart = ref([])
+
+const filteredProducts = computed(() => cart.value)
+
+function addToCart(product) {
+  const index = cart.value.findIndex(item => item.id === product.id)
+  if (index !== -1) {
+    cart.value[index].quantidade = (cart.value[index].quantidade || 1) + 1
+  } else {
+    cart.value.push({ ...product, quantidade: 1 })
+  }
+}
+
+function removeFromCart(index) {
+  cart.value.splice(index, 1)
+}
+
+function updateQuantity({ index, quantidade }) {
+  cart.value[index].quantidade = quantidade
+}
+
+function clearCart() {
+  cart.value = []
+}
+
+function finalizeCheckout() {
+  alert('Checkout finalizado!')
+  clearCart()
+}
 </script>
