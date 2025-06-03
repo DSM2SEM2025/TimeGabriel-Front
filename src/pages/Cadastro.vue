@@ -11,26 +11,27 @@
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <div>
           <BaseInput
-            v-model="newPassword"
-            type="password"
-            placeholder="Nova Senha"
-            :icon="LockClosedIcon"
-            :showPasswordToggle="true"
-            @blur="validatePasswords"
+            v-model="email"
+            type="email"
+            placeholder="Email"
+            :icon="MailIcon"
+            @blur="validateEmail"
           />
+          <p v-if="emailError" class="mt-1 text-sm text-red-600">
+            {{ emailError }}
+          </p>
         </div>
 
         <div>
           <BaseInput
-            v-model="confirmPassword"
+            v-model="password"
             type="password"
-            placeholder="Confirme sua Senha"
+            placeholder="Senha"
             :icon="LockClosedIcon"
             :showPasswordToggle="true"
-            @blur="validatePasswords"
+            @blur="validatePassword"
           />
-
-          <p v-if="passwordError" class="mt-2 text-sm text-red-600">
+          <p v-if="passwordError" class="mt-1 text-sm text-red-600">
             {{ passwordError }}
           </p>
         </div>
@@ -40,8 +41,17 @@
           class="w-full bg-purple-400 hover:bg-purple-500"
           :loading="isLoading"
         >
-          Finalizar
+          Cadastrar
         </BaseButton>
+
+        <div class="text-center">
+          <router-link
+            to="/login"
+            class="text-sm text-gray-600 hover:text-gray-800"
+          >
+            Voltar para Login
+          </router-link>
+        </div>
       </form>
     </div>
 
@@ -59,73 +69,67 @@
         class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg px-4 py-2 flex items-center"
       >
         <CheckCircleIcon class="h-5 w-5 text-green-500 mr-2" />
-        <span>Nova Senha Cadastrada com Sucesso!</span>
+        <span>Cadastro realizado com sucesso!</span>
       </div>
     </Transition>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
-import {
-  CubeIcon,
-  LockClosedIcon,
-  CheckCircleIcon,
-} from "@heroicons/vue/outline";
+import { CubeIcon, MailIcon, LockClosedIcon, CheckCircleIcon } from "@heroicons/vue/outline";
 import BaseInput from "@/components/ui/Login/BaseInput.vue";
 import BaseButton from "@/components/ui/Login/BaseButton.vue";
 
 const router = useRouter();
-const newPassword = ref("");
-const confirmPassword = ref("");
+const email = ref("");
+const password = ref("");
 const isLoading = ref(false);
-const showSuccessMessage = ref(false);
+const emailError = ref("");
 const passwordError = ref("");
+const showSuccessMessage = ref(false);
 
-const validatePasswords = () => {
-  if (newPassword.value && confirmPassword.value) {
-    if (newPassword.value !== confirmPassword.value) {
-      passwordError.value = "As senhas não coincidem";
-    } else {
-      passwordError.value = "";
-    }
+const validateEmail = () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email.value) {
+    emailError.value = "Email é obrigatório";
+  } else if (!emailRegex.test(email.value)) {
+    emailError.value = "Email inválido";
+  } else {
+    emailError.value = "";
   }
 };
 
-watch([newPassword, confirmPassword], () => {
-  if (newPassword.value && confirmPassword.value) {
-    validatePasswords();
+const validatePassword = () => {
+  if (!password.value) {
+    passwordError.value = "Senha é obrigatória";
+  } else if (password.value.length < 6) {
+    passwordError.value = "A senha deve ter no mínimo 6 caracteres";
+  } else {
+    passwordError.value = "";
   }
-});
+};
 
 const handleSubmit = async () => {
-  if (!newPassword.value || !confirmPassword.value) {
-    passwordError.value = "Preencha todos os campos";
-    return;
-  }
+  validateEmail();
+  validatePassword();
 
-  if (newPassword.value !== confirmPassword.value) {
-    passwordError.value = "As senhas não coincidem";
-    return;
-  }
+  if (emailError.value || passwordError.value) return;
 
   try {
     isLoading.value = true;
-    passwordError.value = ""; 
-
-    // Simulando chamada da API
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    // Aqui você implementaria a chamada para o backend
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulação de chamada API
 
     showSuccessMessage.value = true;
-
-    // Aguarda 2 segundos e redireciona para o login
-    setTimeout(async () => {
-      await router.push("/login");
+    
+    // Redireciona para login após 2 segundos
+    setTimeout(() => {
+      router.push('/login');
     }, 2000);
-  } catch (err) {
-    passwordError.value = "Erro ao cadastrar nova senha";
-    console.error("Erro:", err);
+  } catch (error) {
+    console.error('Erro ao cadastrar:', error);
   } finally {
     isLoading.value = false;
   }

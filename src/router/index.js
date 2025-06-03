@@ -14,21 +14,9 @@ const routes = [
     meta: { requiresGuest: true },
   },
   {
-    path: "/esqueci-senha",
-    name: "esqueci-senha",
-    component: () => import("@/pages/EsqueciSenha.vue"),
-    meta: { requiresGuest: true },
-  },
-  {
-    path: "/nova-senha",
-    name: "nova-senha",
-    component: () => import("@/pages/NovaSenha.vue"),
-    meta: { requiresGuest: true },
-  },
-  {
-    path: "/verificar-codigo",
-    name: "verificar-codigo",
-    component: () => import("@/pages/CodigoVerificacao.vue"),
+    path: "/cadastro",
+    name: "cadastro",
+    component: () => import("@/pages/Cadastro.vue"),
     meta: { requiresGuest: true },
   },
   {

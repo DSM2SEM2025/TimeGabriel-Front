@@ -21,17 +21,17 @@
           v-model="password"
           type="password"
           placeholder="Senha"
-          class="mb-2"
+          class="mb-4"
           :icon="LockClosedIcon"
           :showPasswordToggle="true"
         />
 
         <div class="text-center mb-4">
           <router-link
-            to="/esqueci-senha"
+            to="/cadastro"
             class="text-sm text-gray-600 hover:text-gray-800"
           >
-            Esqueceu a Senha?
+            Cadastrar usuário
           </router-link>
         </div>
 
