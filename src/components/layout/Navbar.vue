@@ -1,21 +1,28 @@
 <template>
   <header class="bg-white border-b border-gray-200 h-16 flex items-center px-6">
-    <h1 class="text-2xl font-bold">{{ title }}</h1>
-    <div class="flex items-center ml-auto">
-      <!-- Barra de pesquisa -->
-      <div class="relative mr-4">
+    <h1 class="text-xl md:text-2xl font-bold truncate">{{ title }}</h1>
+
+    <div class="flex items-center ml-auto gap-2">
+      <div class="relative hidden md:block mr-4">
         <input
           type="text"
           placeholder="Pesquisar"
-          class="bg-gray-100 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-purple-300 w-64"
+          class="bg-gray-100 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-purple-300 w-48 lg:w-64"
         />
         <SearchIcon class="h-5 w-5 text-gray-500 absolute left-3 top-2.5" />
       </div>
 
-      <div class="relative flex items-center">
+      <button
+        @click="toggleMobileSearch"
+        class="md:hidden p-2 hover:bg-gray-100 rounded-full"
+      >
+        <SearchIcon class="h-5 w-5 text-gray-600" />
+      </button>
+
+      <div class="relative">
         <button
           @click.stop="toggleNotifications"
-          class="relative mr-4 flex items-center justify-center h-8 w-8"
+          class="relative flex items-center justify-center h-8 w-8 hover:bg-gray-100 rounded-full"
         >
           <BellIcon class="h-6 w-6 text-gray-600" />
           <span
@@ -104,14 +111,37 @@
         </Transition>
       </div>
 
-      <!-- Botão de Logout  -->
       <button
         @click="handleLogout"
-        class="flex items-center justify-center h-8 w-8 text-gray-600 hover:text-gray-800"
+        class="flex items-center justify-center h-8 w-8 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full"
       >
         <LogoutIcon class="h-6 w-6" />
       </button>
     </div>
+
+    <!-- Barra de pesquisa mobile -->
+    <Transition
+      enter-active-class="transition ease-out duration-100"
+      enter-from-class="transform opacity-0 -translate-y-4"
+      enter-to-class="transform opacity-100 translate-y-0"
+      leave-active-class="transition ease-in duration-75"
+      leave-from-class="transform opacity-100 translate-y-0"
+      leave-to-class="transform opacity-0 -translate-y-4"
+    >
+      <div
+        v-if="showMobileSearch"
+        class="absolute top-16 left-0 right-0 bg-white p-4 shadow-lg z-40 md:hidden"
+      >
+        <div class="relative">
+          <input
+            type="text"
+            placeholder="Pesquisar"
+            class="w-full bg-gray-100 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-purple-300"
+          />
+          <SearchIcon class="h-5 w-5 text-gray-500 absolute left-3 top-2.5" />
+        </div>
+      </div>
+    </Transition>
   </header>
 </template>
 
@@ -134,6 +164,7 @@ const router = useRouter();
 const { logout } = useAuth();
 const { notifications, unreadCount, markAllAsRead } = useNotifications();
 const showNotifications = ref(false);
+const showMobileSearch = ref(false);
 
 const title = computed(() => {
   return route.meta.title || "Dashboard";
@@ -148,6 +179,10 @@ const toggleNotifications = () => {
   showNotifications.value = !showNotifications.value;
 };
 
+const toggleMobileSearch = () => {
+  showMobileSearch.value = !showMobileSearch.value;
+};
+
 const getNotificationIcon = (type) => {
   const icons = {
     "baixo-estoque": ExclamationIcon,
@@ -160,17 +195,31 @@ const getNotificationIcon = (type) => {
 const handleClickOutside = (event) => {
   const notificationButton = event.target.closest("button");
   const notificationDropdown = event.target.closest(".absolute.right-0");
+  const searchButton = event.target.closest("[data-search-toggle]");
+  const searchBar = event.target.closest("[data-search-bar]");
 
   if (!notificationButton && !notificationDropdown) {
     showNotifications.value = false;
+  }
+
+  if (!searchButton && !searchBar) {
+    showMobileSearch.value = false;
+  }
+};
+
+const handleResize = () => {
+  if (window.innerWidth >= 768) {
+    showMobileSearch.value = false;
   }
 };
 
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
+  window.addEventListener("resize", handleResize);
 });
 
 onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside);
+  window.removeEventListener("resize", handleResize);
 });
 </script>

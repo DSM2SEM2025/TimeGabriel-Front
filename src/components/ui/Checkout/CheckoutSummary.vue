@@ -1,5 +1,5 @@
 <template>
-  <div class="w-1/4 bg-purple-300 text-white p-4 rounded shadow flex flex-col">
+  <div class="bg-purple-300 text-white p-4 rounded shadow flex flex-col">
     <h2 class="text-lg font-semibold mb-2">
       Resumo Checkout
       <div class="text-sm font-normal text-white/70">
@@ -7,56 +7,75 @@
       </div>
     </h2>
 
-    <div v-for="(item, index) in cart" :key="item.id" class="mb-2 bg-white text-black rounded p-2">
-      <div class="flex justify-between items-center">
-        <div>
-          <div class="font-semibold">{{ item.nome }}</div>
-          <div class="text-sm text-gray-500">
-            {{ formatarPreco(item.preco) }} cada
-          </div>
-        </div>
-        <div class="text-right">
-          <div class="flex items-center gap-1">
-            <button class="px-2" @click="decrementar(index)">−</button>
-            <span>{{ item.quantidade || 1 }}</span>
-            <button class="px-2" @click="incrementar(index)">+</button>
-          </div>
-          <div class="font-semibold">R$ {{ formatarPreco(item.preco * (item.quantidade || 1)) }}</div>
-        </div>
-      </div>
-      <button
-        @click="$emit('remove', index)"
-        class="text-sm text-red-500 hover:text-red-700 mt-1"
+    <div class="flex-1 overflow-y-auto max-h-[50vh] lg:max-h-[60vh]">
+      <div
+        v-for="(item, index) in cart"
+        :key="item.id"
+        class="mb-2 bg-white text-black rounded p-2"
       >
-        Remover
-      </button>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div class="flex-1">
+            <div class="font-semibold">{{ item.nome }}</div>
+            <div class="text-sm text-gray-500">
+              {{ formatarPreco(item.preco) }} cada
+            </div>
+          </div>
+          <div class="flex flex-col items-end gap-1">
+            <div class="flex items-center gap-2">
+              <button 
+                class="w-8 h-8 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700"
+                @click="decrementar(index)"
+              >
+              </button>
+              <span class="w-8 text-center">{{ item.quantidade || 1 }}</span>
+              <button 
+                class="w-8 h-8 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700"
+                @click="incrementar(index)"
+              >
+                +
+              </button>
+            </div>
+            <div class="font-semibold">R$ {{ formatarPreco(item.preco * (item.quantidade || 1)) }}</div>
+          </div>
+        </div>
+        <button
+          @click="$emit('remove', index)"
+          class="text-sm text-red-500 hover:text-red-700 mt-2"
+        >
+          Remover
+        </button>
+      </div>
     </div>
 
-    <hr class="my-2 border-white/40" />
+    <div class="mt-4 space-y-3">
+      <hr class="border-white/40" />
+      
+      <div class="flex justify-between font-semibold text-lg">
+        <span>Total:</span>
+        <span>R$ {{ formatarPreco(total) }}</span>
+      </div>
 
-    <div class="flex justify-between font-semibold mb-4">
-  <span>Total:</span>
-  <span>R$ {{ formatarPreco(total) }}</span>
-</div>
-
-
-    <button
-      class="bg-white text-purple-700 font-bold py-2 rounded mb-2"
-      @click="$emit('finalize')"
-    >
-      Finalizar Checkout
-    </button>
-
-    <button
-      class="bg-white text-purple-700 py-2 rounded mb-2"
-      @click="$emit('clear')"
-    >
-      Limpar Carrinho
-    </button>
-
-    <button class="bg-white text-purple-700 py-2 rounded">
-      Imprimir
-    </button>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <button
+          class="w-full bg-white text-purple-700 font-bold py-3 px-4 rounded hover:bg-purple-50"
+          @click="$emit('finalize')"
+        >
+          Finalizar
+        </button>
+        <button
+          class="w-full bg-white text-purple-700 py-3 px-4 rounded hover:bg-purple-50"
+          @click="$emit('clear')"
+        >
+          Limpar
+        </button>
+      </div>
+      
+      <button 
+        class="w-full bg-white text-purple-700 py-3 px-4 rounded hover:bg-purple-50"
+      >
+        Imprimir
+      </button>
+    </div>
   </div>
 </template>
 

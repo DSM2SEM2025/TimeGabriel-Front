@@ -1,17 +1,23 @@
 <template>
-  <div class="checkout-page flex justify-between p-6 gap-6">
-    <div class="w-3/4">
-      <ProductSearch @add-to-cart="addToCart" />
-      <ProductTable :products="filteredProducts" />
+  <div class="p-6">
+    <div class="flex flex-col lg:flex-row gap-6">
+      <div class="w-full lg:w-3/4 space-y-6">
+        <ProductSearch @add-to-cart="addToCart" />
+        <ProductTable :products="filteredProducts" />
+      </div>
+
+      <div class="w-full lg:w-1/4">
+        <div class="sticky top-6">
+          <CheckoutSummary
+            :cart="cart"
+            @remove="removeFromCart"
+            @finalize="finalizeCheckout"
+            @clear="clearCart"
+            @update-quantity="updateQuantity"
+          />
+        </div>
+      </div>
     </div>
-    <CheckoutSummary
-      :cart="cart"
-      @remove="removeFromCart"
-      @finalize="finalizeCheckout"
-      @clear="clearCart"
-      @update-quantity="updateQuantity"
-      class="ml-6" 
-    />
   </div>
 </template>
 
