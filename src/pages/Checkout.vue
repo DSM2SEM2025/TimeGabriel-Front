@@ -1,5 +1,5 @@
 <template>
-  <div class="checkout-page flex justify-between p-6">
+  <div class="checkout-page flex justify-between p-6 gap-6">
     <div class="w-3/4">
       <ProductSearch @add-to-cart="addToCart" />
       <ProductTable :products="filteredProducts" />
@@ -10,6 +10,7 @@
       @finalize="finalizeCheckout"
       @clear="clearCart"
       @update-quantity="updateQuantity"
+      class="ml-6" 
     />
   </div>
 </template>
