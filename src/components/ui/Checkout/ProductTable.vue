@@ -1,42 +1,65 @@
 <template>
-  <table class="w-full border-collapse">
-    <thead>
-      <tr class="bg-gray-100">
-        <th class="border px-4 py-2 text-left">Nome</th>
-        <th class="border px-4 py-2 text-left">Categoria</th>
-        <th class="border px-4 py-2 text-right">Preço (R$)</th>
-        <th class="border px-4 py-2 text-right">Estoque</th>
-        <th class="border px-4 py-2 text-center">Ação</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="product in products"
-        :key="product.id"
-        class="hover:bg-gray-50"
-      >
-        <td class="border px-4 py-2">{{ product.nome }}</td>
-        <td class="border px-4 py-2">{{ product.categoria }}</td>
-        <td class="border px-4 py-2 text-right">{{ product.preco.toFixed(2) }}</td>
-        <td class="border px-4 py-2 text-right">{{ product.estoque }}</td>
-        <td class="border px-4 py-2 text-center">
-          <button
-            class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-            @click="$emit('add-to-cart', product)"
-            :disabled="product.estoque === 0"
-            title="Adicionar ao carrinho"
-          >
-            Adicionar
-          </button>
-        </td>
-      </tr>
-      <tr v-if="products.length === 0">
-        <td colspan="5" class="text-center py-4 text-gray-500">
-          Nenhum produto encontrado.
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="overflow-x-auto rounded-lg shadow">
+    <table class="w-full border-collapse bg-white">
+      <thead>
+        <tr class="bg-gray-50">
+          <th class="px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-600">
+            Nome
+          </th>
+          <th class="hidden sm:table-cell px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-600">
+            Categoria
+          </th>
+          <th class="px-4 py-3 text-right text-xs sm:text-sm font-medium text-gray-600">
+            Preço (R$)
+          </th>
+          <th class="px-4 py-3 text-right text-xs sm:text-sm font-medium text-gray-600">
+            Estoque
+          </th>
+          <th class="px-4 py-3 text-center text-xs sm:text-sm font-medium text-gray-600">
+            Ação
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <tr
+          v-for="product in products"
+          :key="product.id"
+          class="hover:bg-gray-50"
+        >
+          <td class="px-4 py-3">
+            <div class="flex flex-col">
+              <span class="font-medium text-sm sm:text-base">{{ product.nome }}</span>
+              <span class="text-xs text-gray-500 sm:hidden">{{ product.categoria }}</span>
+            </div>
+          </td>
+          <td class="hidden sm:table-cell px-4 py-3 text-sm">
+            {{ product.categoria }}
+          </td>
+          <td class="px-4 py-3 text-right text-sm sm:text-base">
+            {{ formatPrice(product.preco) }}
+          </td>
+          <td class="px-4 py-3 text-right text-sm sm:text-base">
+            {{ product.estoque }}
+          </td>
+          <td class="px-4 py-3 text-center">
+            <button
+              class="w-full sm:w-auto px-3 py-1.5 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              @click="$emit('add-to-cart', product)"
+              :disabled="product.estoque === 0"
+              :title="product.estoque === 0 ? 'Produto sem estoque' : 'Adicionar ao carrinho'"
+            >
+              {{ product.estoque === 0 ? 'Indisponível' : 'Adicionar' }}
+            </button>
+          </td>
+        </tr>
+        <tr v-if="products.length === 0">
+          <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+            <p class="text-sm sm:text-base">Nenhum produto encontrado.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script setup>
@@ -46,4 +69,8 @@ defineProps({
     required: true
   }
 })
+
+function formatPrice(price) {
+  return price.toFixed(2).replace('.', ',')
+}
 </script>

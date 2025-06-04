@@ -1,9 +1,20 @@
 <template>
-  <div class="p-6">
-    <div class="flex flex-col lg:flex-row gap-6">
-      <div class="w-full lg:w-3/4 space-y-6">
-        <ProductSearch @add-to-cart="addToCart" />
-        <ProductTable :products="filteredProducts" />
+  <div class="p-4 sm:p-6">
+    <div class="flex flex-col lg:flex-row gap-4 sm:gap-6">
+      <div class="w-full lg:w-3/4 space-y-4 sm:space-y-6">
+        <div class="bg-white rounded-lg shadow p-4">
+          <ProductSearch 
+            @add-to-cart="addToCart" 
+            class="w-full"
+          />
+        </div>
+
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <ProductTable 
+            :products="filteredProducts"
+            class="w-full"
+          />
+        </div>
       </div>
 
       <div class="w-full lg:w-1/4">
@@ -14,6 +25,7 @@
             @finalize="finalizeCheckout"
             @clear="clearCart"
             @update-quantity="updateQuantity"
+            class="w-full"
           />
         </div>
       </div>
@@ -57,3 +69,12 @@ function finalizeCheckout() {
   clearCart()
 }
 </script>
+
+<style scoped>
+@media (max-width: 1023px) {
+  .sticky {
+    position: relative;
+    top: 0;
+  }
+}
+</style>

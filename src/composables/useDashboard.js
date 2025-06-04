@@ -1,42 +1,74 @@
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 
 export function useDashboard() {
-  const dashboardData = ref({
-    stats: {
-      totalProducts: "60",
-      totalProductsTrend: "+3%",
-      lowStockProducts: "10",
-      lowStockProductsTrend: "+3",
-      pendingDeliveries: "15"
-    },
-    recentActivity: [
-      {
-        type: "Produto adicionado",
-        description: "Leite 1L",
-        value: "10 unidades",
-        time: "10 minutos atrás"
-      }
-    ],
-    lowStockAlerts: [
-      {
-        name: "Laranjas",
-        remaining: "2",
-        minimum: "15"
-      }
-    ]
+  const dashboardStats = ref({
+    totalProducts: 0,
+    lowStockProducts: 0,
+    pendingDeliveries: 0,
+    productOutput: 0,
+    totalProductsTrend: "",
+    lowStockProductsTrend: "",
+    pendingDeliveriesTrend: "",
+    productOutputTrend: "",
   });
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardStats = async () => {
     try {
-      return dashboardData.value;
+      const response = await fetch("/api/dashboard/stats");
+      const data = await response.json();
+      updateStats(data);
     } catch (error) {
-      console.error("Erro ao carregar dados do painel:", error);
-      throw error;
+      console.error("Erro ao buscar estatísticas:", error);
     }
   };
 
+  const updateStats = (data) => {
+    dashboardStats.value = {
+      totalProducts: data.totalProducts,
+      lowStockProducts: data.lowStockProducts,
+      pendingDeliveries: data.pendingDeliveries,
+      productOutput: data.productOutput,
+      totalProductsTrend: data.totalProductsTrend,
+      lowStockProductsTrend: data.lowStockProductsTrend,
+      pendingDeliveriesTrend: data.pendingDeliveriesTrend,
+      productOutputTrend: data.productOutputTrend,
+    };
+  };
+
+  // Conexão WebSocket para atualização em tempo real WebSocket
+  let ws = null;
+
+  const initializeWebSocket = () => {
+    ws = new WebSocket("seu_websocket_url");
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "DASHBOARD_STATS_UPDATE") {
+        updateStats(data);
+      }
+    };
+
+    ws.onclose = () => {
+      // Tenta reconectar após 5 segundos
+      setTimeout(initializeWebSocket, 5000);
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+  };
+
+  onMounted(() => {
+    fetchDashboardStats();
+    initializeWebSocket();
+  });
+
+  onUnmounted(() => {
+    if (ws) ws.close();
+  });
+
   return {
-    dashboardData,
-    fetchDashboardData
+    dashboardStats,
+    fetchDashboardStats,
   };
 }

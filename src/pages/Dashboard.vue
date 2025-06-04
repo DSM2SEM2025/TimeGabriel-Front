@@ -3,32 +3,34 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <SummaryCard
         title="Total de Produtos"
-        value="60"
+        :value="dashboardStats.totalProducts"
         :icon="CubeIcon"
         color="bg-blue-100"
-        change="+3"
+        :change="dashboardStats.totalProductsTrend"
         @click="navigateTo('/produtos')"
       />
       <SummaryCard
         title="Produtos em Baixo estoque"
-        value="10"
+        :value="dashboardStats.lowStockProducts"
         :icon="ExclamationIcon"
         color="bg-yellow-100"
-        change="-3"
+        :change="dashboardStats.lowStockProductsTrend"
         @click="navigateTo('/estoque')"
       />
       <SummaryCard
         title="Entregas Pendentes"
-        value="15"
+        :value="dashboardStats.pendingDeliveries"
         :icon="TruckIcon"
         color="bg-orange-100"
+        :change="dashboardStats.pendingDeliveriesTrend"
         @click="navigateTo('/entregas')"
       />
       <SummaryCard
         title="Saída de Produtos"
-        value="12"
+        :value="dashboardStats.productOutput"
         :icon="ArrowUpIcon"
         color="bg-green-100"
+        :change="dashboardStats.productOutputTrend"
         @click="navigateTo('/checkout')"
       />
     </div>
@@ -159,10 +161,12 @@ import {
   SearchIcon
 } from "@heroicons/vue/outline";
 import { useRouter } from "vue-router";
+import { useDashboard } from "@/composables/useDashboard";
 import SummaryCard from "../components/ui/Dashboard/SummaryCard.vue";
 import ActionCard from "../components/ui/Dashboard/ActionCard.vue";
 
 const router = useRouter();
+const { dashboardStats } = useDashboard();
 
 const navigateTo = (path) => {
   router.push(path);

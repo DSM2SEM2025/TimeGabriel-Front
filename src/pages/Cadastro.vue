@@ -1,14 +1,14 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-purple-300">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-      <div class="flex justify-center mb-6">
+  <div class="flex items-center justify-center min-h-screen bg-purple-300 px-4 sm:px-6">
+    <div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-md mx-auto">
+      <div class="flex justify-center mb-6 sm:mb-8">
         <div class="flex items-center">
-          <CubeIcon class="h-6 w-6 mr-2" />
-          <h1 class="text-2xl font-bold">Mini Mercado Ideal</h1>
+          <CubeIcon class="h-6 w-6 sm:h-8 sm:w-8 mr-2 sm:mr-3 text-purple-500" />
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Mini Mercado Ideal</h1>
         </div>
       </div>
 
-      <form @submit.prevent="handleSubmit" class="space-y-4">
+      <form @submit.prevent="handleSubmit" class="space-y-4 sm:space-y-6">
         <div>
           <BaseInput
             v-model="email"
@@ -16,8 +16,9 @@
             placeholder="Email"
             :icon="MailIcon"
             @blur="validateEmail"
+            class="text-sm sm:text-base"
           />
-          <p v-if="emailError" class="mt-1 text-sm text-red-600">
+          <p v-if="emailError" class="mt-1 text-xs sm:text-sm text-red-600">
             {{ emailError }}
           </p>
         </div>
@@ -30,24 +31,25 @@
             :icon="LockClosedIcon"
             :showPasswordToggle="true"
             @blur="validatePassword"
+            class="text-sm sm:text-base"
           />
-          <p v-if="passwordError" class="mt-1 text-sm text-red-600">
+          <p v-if="passwordError" class="mt-1 text-xs sm:text-sm text-red-600">
             {{ passwordError }}
           </p>
         </div>
 
         <BaseButton
           type="submit"
-          class="w-full bg-purple-400 hover:bg-purple-500"
+          class="w-full bg-purple-400 hover:bg-purple-500 text-white font-medium py-2.5 sm:py-3 rounded-lg transition-colors"
           :loading="isLoading"
         >
-          Cadastrar
+          {{ isLoading ? 'Cadastrando...' : 'Cadastrar' }}
         </BaseButton>
 
         <div class="text-center">
           <router-link
             to="/login"
-            class="text-sm text-gray-600 hover:text-gray-800"
+            class="text-sm sm:text-base text-gray-600 hover:text-gray-800 transition-colors"
           >
             Voltar para Login
           </router-link>
@@ -55,7 +57,7 @@
       </form>
     </div>
 
-    <!-- Pop-up de sucesso -->
+    <!-- Pop-up -->
     <Transition
       enter-active-class="transform transition duration-300 ease-out"
       enter-from-class="translate-y-2 opacity-0"
@@ -66,9 +68,9 @@
     >
       <div
         v-if="showSuccessMessage"
-        class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg px-4 py-2 flex items-center"
+        class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg px-4 py-2 flex items-center text-sm sm:text-base"
       >
-        <CheckCircleIcon class="h-5 w-5 text-green-500 mr-2" />
+        <CheckCircleIcon class="h-5 w-5 sm:h-6 sm:w-6 text-green-500 mr-2" />
         <span>Cadastro realizado com sucesso!</span>
       </div>
     </Transition>

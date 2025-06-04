@@ -1,19 +1,18 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-purple-300">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-      <div class="flex justify-center mb-6">
+  <div class="flex items-center justify-center min-h-screen bg-purple-300 px-4 sm:px-6">
+    <div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-md mx-auto">
+      <div class="flex justify-center mb-6 sm:mb-8">
         <div class="flex items-center">
-          <CubeIcon class="h-6 w-6 mr-2" />
-          <h1 class="text-2xl font-bold">Mini Mercado Ideal</h1>
+          <CubeIcon class="h-6 w-6 sm:h-8 sm:w-8 mr-2 sm:mr-3 text-purple-500" />
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Mini Mercado Ideal</h1>
         </div>
       </div>
 
-      <form @submit.prevent="handleLogin">
+      <form @submit.prevent="handleLogin" class="space-y-4 sm:space-y-6">
         <BaseInput
           v-model="email"
           type="email"
           placeholder="Email"
-          class="mb-4"
           :icon="MailIcon"
         />
 
@@ -21,15 +20,14 @@
           v-model="password"
           type="password"
           placeholder="Senha"
-          class="mb-4"
           :icon="LockClosedIcon"
           :showPasswordToggle="true"
         />
 
-        <div class="text-center mb-4">
+        <div class="text-center">
           <router-link
             to="/cadastro"
-            class="text-sm text-gray-600 hover:text-gray-800"
+            class="text-sm sm:text-base text-gray-600 hover:text-gray-800 transition-colors"
           >
             Cadastrar usuário
           </router-link>
@@ -37,12 +35,16 @@
 
         <BaseButton
           type="submit"
-          class="w-full bg-purple-400 hover:bg-purple-500"
+          class="w-full bg-purple-400 hover:bg-purple-500 text-white font-medium py-2.5 sm:py-3 rounded-lg transition-colors"
           :loading="isLoading"
         >
-          Entrar
+          {{ isLoading ? 'Entrando...' : 'Entrar' }}
         </BaseButton>
       </form>
+
+      <div v-if="error" class="mt-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg">
+        {{ error }}
+      </div>
     </div>
   </div>
 </template>
@@ -59,17 +61,23 @@ const router = useRouter();
 const email = ref("");
 const password = ref("");
 const isLoading = ref(false);
+const error = ref("");
 const { login } = useAuth();
 
 const handleLogin = async () => {
-  if (!email.value || !password.value) return;
+  if (!email.value || !password.value) {
+    error.value = "Por favor, preencha todos os campos";
+    return;
+  }
 
   try {
+    error.value = "";
     isLoading.value = true;
     await login(email.value, password.value);
     router.push("/dashboard");
-  } catch (error) {
-    console.error("Erro ao fazer login:", error);
+  } catch (err) {
+    error.value = "Email ou senha inválidos";
+    console.error("Erro ao fazer login:", err);
   } finally {
     isLoading.value = false;
   }
