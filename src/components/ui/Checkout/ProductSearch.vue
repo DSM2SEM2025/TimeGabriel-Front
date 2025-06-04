@@ -22,7 +22,6 @@
 </template>
 
 <script setup>
-import { defineEmits, defineProps } from 'vue'
 import { SearchIcon } from '@heroicons/vue/outline'
 
 const props = defineProps({
