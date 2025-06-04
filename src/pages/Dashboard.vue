@@ -3,121 +3,64 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <SummaryCard
         title="Total de Produtos"
-        value="60"
+        :value="dashboardData.totalProdutos"
         :icon="CubeIcon"
         color="bg-blue-100"
-        change="+3"
+        :change="dashboardData.totalProdutosChange"
         @click="navigateTo('/produtos')"
       />
       <SummaryCard
         title="Produtos em Baixo estoque"
-        value="10"
+        :value="dashboardData.produtosBaixoEstoque"
         :icon="ExclamationIcon"
         color="bg-yellow-100"
-        change="-3"
+        :change="dashboardData.produtosBaixoEstoqueChange"
         @click="navigateTo('/estoque')"
       />
       <SummaryCard
         title="Entregas Pendentes"
-        value="15"
+        :value="dashboardData.entregasPendentes"
         :icon="TruckIcon"
         color="bg-orange-100"
         @click="navigateTo('/entregas')"
       />
       <SummaryCard
         title="Saída de Produtos"
-        value="12"
+        :value="dashboardData.saidaProdutos"
         :icon="ArrowUpIcon"
         color="bg-green-100"
         @click="navigateTo('/checkout')"
       />
     </div>
 
-    <div class="bg-white rounded-2xl shadow mb-6">
-      <div class="p-6 border-b border-gray-200">
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
-          <h2 class="text-lg font-semibold">Atividade Recente</h2>
-          
-          <div class="relative w-full sm:w-96">
-            <SearchIcon class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Buscar por produto, tipo ou data..."
-              class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300"
-            />
-          </div>
-        </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div class="lg:col-span-2 bg-white p-4 rounded-2xl shadow">
+        <h2 class="text-lg font-semibold mb-4">Atividade recente</h2>
+        <ul class="text-sm divide-y">
+          <li v-for="(item, index) in dashboardData.atividadesRecentes" :key="index" class="py-2">
+            {{ item.descricao }}
+            <span class="text-gray-500">({{ item.tempo }})</span>
+          </li>
+        </ul>
+        <button class="mt-4 text-sm text-blue-600 hover:underline">
+          Ver todas as atividades
+        </button>
+      </div>
 
-        <!-- Tabela -->
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tipo
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Descrição
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Quantidade
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Data/Hora
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-              <tr v-for="item in paginatedActivities" :key="item.id" class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span :class="getActivityTypeClass(item.type)" class="px-2 py-1 text-xs rounded-full">
-                    {{ item.type }}
-                  </span>
-                </td>
-                <td class="px-6 py-4">{{ item.description }}</td>
-                <td class="px-6 py-4">{{ item.value }}</td>
-                <td class="px-6 py-4 text-gray-500">{{ item.time }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
-          <div class="flex items-center gap-2">
-            <span class="text-sm text-gray-600">Itens por página:</span>
-            <select
-              v-model="itemsPerPage"
-              class="border rounded-md px-2 py-1 text-sm"
-              @change="currentPage = 1"
-            >
-              <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
-                {{ option }}
-              </option>
-            </select>
-          </div>
-
-          <div class="text-sm text-gray-600">
-            Página {{ currentPage }} de {{ totalPages }}
-            ({{ filteredActivities.length }} itens)
-          </div>
-
-          <div class="flex gap-2">
-            <button
-              v-for="page in totalPages"
-              :key="page"
-              @click="currentPage = page"
-              class="px-3 py-1 rounded-md text-sm"
-              :class="[
-                currentPage === page
-                  ? 'bg-purple-500 text-white'
-                  : 'text-gray-700 hover:bg-gray-50 border border-gray-300'
-              ]"
-            >
-              {{ page }}
-            </button>
-          </div>
-        </div>
+      <div class="bg-yellow-100 p-4 rounded-2xl shadow">
+        <h2 class="text-lg font-semibold mb-2">Alerta de Estoque Baixo</h2>
+        <p class="text-sm text-gray-600 mb-3">Itens que precisam de reposição</p>
+        <ul class="text-sm">
+          <li v-for="(item, index) in dashboardData.alertasEstoque" :key="index" class="flex justify-between border-b py-1">
+            {{ item.nome }}
+            <span class="text-red-600">
+              {{ item.quantidade }} restando <span v-if="item.minimo" class="text-gray-500">(Mínimo: {{ item.minimo }})</span>
+            </span>
+          </li>
+        </ul>
+        <button class="mt-4 px-4 py-2 bg-yellow-300 hover:bg-yellow-400 rounded-lg text-sm">
+          Repor Estoque
+        </button>
       </div>
     </div>
 
@@ -148,15 +91,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { 
+import { ref, onMounted } from "vue";
+import {
   CubeIcon,
   ExclamationIcon,
   TruckIcon,
   ArrowUpIcon,
   PlusIcon,
   PencilIcon,
-  SearchIcon
 } from "@heroicons/vue/outline";
 import { useRouter } from "vue-router";
 import SummaryCard from "../components/ui/Dashboard/SummaryCard.vue";
@@ -168,76 +110,47 @@ const navigateTo = (path) => {
   router.push(path);
 };
 
-// Pesquisa e paginação
-const searchQuery = ref('');
-const currentPage = ref(1);
-const itemsPerPage = ref(10);
-const itemsPerPageOptions = [10, 20, 50];
-
-//Implementar o backend aqui
-const activities = ref([
-  {
-    id: 1,
-    type: 'Adição',
-    description: 'Margarina',
-    value: '10 unidades',
-    time: '10 minutos atrás'
-  },
-  {
-    id: 2,
-    type: 'Atualização',
-    description: 'Biscoito Oreo',
-    value: '-15 unidades',
-    time: '25 minutos atrás'
-  },
-  {
-    id: 3,
-    type: 'Entrega',
-    description: 'Coca-Cola pedido #447',
-    value: '32 itens',
-    time: '1 hora atrás'
-  },
-  {
-    id: 4,
-    type: 'Alerta',
-    description: 'Ovos de Galinha Caipira',
-    value: '2 unidades restantes',
-    time: '1 dia atrás'
-  }
-]);
-
-// Filtro das atividades com base na pesquisa
-const filteredActivities = computed(() => {
-  if (!searchQuery.value) return activities.value;
-  
-  const query = searchQuery.value.toLowerCase();
-  return activities.value.filter(item => 
-    item.description.toLowerCase().includes(query) ||
-    item.type.toLowerCase().includes(query) ||
-    item.value.toLowerCase().includes(query) ||
-    item.time.toLowerCase().includes(query)
-  );
+const dashboardData = ref({
+  totalProdutos: 0,
+  totalProdutosChange: "",
+  produtosBaixoEstoque: 0,
+  produtosBaixoEstoqueChange: "",
+  entregasPendentes: 0,
+  saidaProdutos: 0,
+  atividadesRecentes: [],
+  alertasEstoque: [],
 });
 
-const paginatedActivities = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value;
-  const end = start + itemsPerPage.value;
-  return filteredActivities.value.slice(start, end);
-});
+function fetchDashboardData() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        totalProdutos: 60,
+        totalProdutosChange: "+3",
+        produtosBaixoEstoque: 10,
+        produtosBaixoEstoqueChange: "-3",
+        entregasPendentes: 15,
+        saidaProdutos: 12,
+        atividadesRecentes: [
+          { descricao: "Produto adicionado - Margarina - 10 unidades", tempo: "10 minutos atrás" },
+          { descricao: "Estoque Atualizado - Biscoito Oreo - -15 unidades", tempo: "25 minutos atrás" },
+          { descricao: "Entrega Confirmada - Coca-Cola pedido #447 - 32 itens", tempo: "1 hora atrás" },
+          { descricao: "Alerta de Estoque Baixo - Ovos de Galinha Caipira - 2 unidades restantes", tempo: "1 dia atrás" },
+        ],
+        alertasEstoque: [
+          { nome: "Abacate", quantidade: 1 },
+          { nome: "Suco de peroba", quantidade: 2, minimo: 9 },
+          { nome: "Bolacha", quantidade: 4, minimo: 7 },
+        ],
+      });
+    }, 500); 
+  });
+}
 
-const totalPages = computed(() => {
-  return Math.ceil(filteredActivities.value.length / itemsPerPage.value);
+onMounted(async () => {
+  const data = await fetchDashboardData();
+  dashboardData.value = data;
 });
-
-const getActivityTypeClass = (type) => {
-  const classes = {
-    'Adição': 'bg-green-100 text-green-800',
-    'Atualização': 'bg-blue-100 text-blue-800',
-    'Alerta': 'bg-red-100 text-red-800',
-    'Entrega': 'bg-purple-100 text-purple-800'
-  };
-  return classes[type] || 'bg-gray-100 text-gray-800';
-};
 </script>
 
 <style scoped></style>

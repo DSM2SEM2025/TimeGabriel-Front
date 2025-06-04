@@ -3,8 +3,10 @@
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
       <!-- Registro Manual -->
       <div class="bg-white rounded-xl shadow p-4 sm:p-6">
-        <h2 class="text-lg font-semibold mb-4 sm:mb-6">Registro Manual de Produtos</h2>
-        
+        <h2 class="text-lg font-semibold mb-4 sm:mb-6">
+          Registro Manual de Produtos
+        </h2>
+
         <form @submit.prevent="handleManualRegister" class="space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -29,7 +31,11 @@
                 required
               >
                 <option value="">Selecione uma categoria</option>
-                <option v-for="category in categories" :key="category" :value="category">
+                <option
+                  v-for="category in categories"
+                  :key="category"
+                  :value="category"
+                >
                   {{ category }}
                 </option>
               </select>
@@ -126,7 +132,9 @@
             />
           </div>
 
-          <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 pt-4">
+          <div
+            class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 pt-4"
+          >
             <button
               type="button"
               @click="resetForm"
@@ -147,8 +155,10 @@
       <!-- Registro Automatizado -->
       <div class="space-y-4 sm:space-y-6">
         <div class="bg-white rounded-xl shadow p-4 sm:p-6">
-          <h2 class="text-lg font-semibold mb-4 sm:mb-6">Registro Automatizado de Produto</h2>
-          
+          <h2 class="text-lg font-semibold mb-4 sm:mb-6">
+            Registro Automatizado de Produto
+          </h2>
+
           <form @submit.prevent="handleAutomatedRegister" class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -178,22 +188,36 @@
           <h3 class="font-semibold mb-4">Como funciona:</h3>
           <ul class="space-y-3 sm:space-y-4">
             <li class="flex items-start">
-              <div class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3">
+              <div
+                class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3"
+              >
                 <span class="text-sm sm:text-base">1</span>
               </div>
-              <p class="text-sm sm:text-base">Coloque o Link da Nota Fiscal e clique em Registrar Produto</p>
+              <p class="text-sm sm:text-base">
+                Coloque o Link da Nota Fiscal e clique em Registrar Produto
+              </p>
             </li>
             <li class="flex items-start">
-              <div class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3">
+              <div
+                class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3"
+              >
                 <span class="text-sm sm:text-base">2</span>
               </div>
-              <p class="text-sm sm:text-base">O sistema automaticamente extrai os produtos do Link da Nota Fiscal</p>
+              <p class="text-sm sm:text-base">
+                O sistema automaticamente extrai os produtos do Link da Nota
+                Fiscal
+              </p>
             </li>
             <li class="flex items-start">
-              <div class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3">
+              <div
+                class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3"
+              >
                 <span class="text-sm sm:text-base">3</span>
               </div>
-              <p class="text-sm sm:text-base">Os produtos ficam marcados como "Entrega Pendente" até a confirmação da entrega</p>
+              <p class="text-sm sm:text-base">
+                Os produtos ficam marcados como "Entrega Pendente" até a
+                confirmação da entrega
+              </p>
             </li>
           </ul>
         </div>
@@ -203,52 +227,101 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 const categories = ["Alimentos", "Bebidas", "Laticínios"];
 
 const manualForm = ref({
-  name: '',
-  category: '',
-  description: '',
+  name: "",
+  category: "",
+  description: "",
   initialQuantity: 0,
   price: 0,
   minQuantity: 1,
-  expiryDate: '',
-  barcode: '',
-  supplier: ''
+  expiryDate: "",
+  barcode: "",
+  supplier: "",
 });
 
 const automatedForm = ref({
-  invoiceLink: ''
+  invoiceLink: "",
 });
 
 const handleManualRegister = () => {
   // Implementar lógica de registro manual
-    //Aqui entra o backend
-  console.log('Produto registrado:', manualForm.value);
+  //Aqui entra o backend
+  console.log("Produto registrado:", manualForm.value);
 };
 
 const handleAutomatedRegister = () => {
   // Implementar lógica de registro automatizado
   //Aqui entra o backend
-  console.log('Link da nota fiscal:', automatedForm.value.invoiceLink);
+  console.log("Link da nota fiscal:", automatedForm.value.invoiceLink);
 };
 
 const resetForm = () => {
-  if (confirm('Deseja cancelar o registro?')) {
+  if (confirm("Deseja cancelar o registro?")) {
     manualForm.value = {
-      name: '',
-      category: '',
-      description: '',
+      name: "",
+      category: "",
+      description: "",
       initialQuantity: 0,
       price: 0,
       minQuantity: 1,
-      expiryDate: '',
-      barcode: '',
-      supplier: ''
+      expiryDate: "",
+      barcode: "",
+      supplier: "",
+    };
+  }
+};
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const categories = ["Alimentos", "Bebidas", "Laticínios"];
+
+const manualForm = ref({
+  name: "",
+  category: "",
+  description: "",
+  initialQuantity: 0,
+  price: 0,
+  minQuantity: 1,
+  expiryDate: "",
+  barcode: "",
+  supplier: "",
+});
+
+const automatedForm = ref({
+  invoiceLink: "",
+});
+
+const handleManualRegister = () => {
+  // Implementar lógica de registro manual
+  //Aqui entra o backend
+  console.log("Produto registrado:", manualForm.value);
+};
+
+const handleAutomatedRegister = () => {
+  // Implementar lógica de registro automatizado
+  //Aqui entra o backend
+  console.log("Link da nota fiscal:", automatedForm.value.invoiceLink);
+};
+
+const resetForm = () => {
+  if (confirm("Deseja cancelar o registro?")) {
+    manualForm.value = {
+      name: "",
+      category: "",
+      description: "",
+      initialQuantity: 0,
+      price: 0,
+      minQuantity: 1,
+      expiryDate: "",
+      barcode: "",
+      supplier: "",
     };
   }
 };
