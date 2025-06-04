@@ -83,6 +83,7 @@ import { useRouter } from "vue-router";
 import { CubeIcon, MailIcon, LockClosedIcon, CheckCircleIcon } from "@heroicons/vue/outline";
 import BaseInput from "@/components/ui/Login/BaseInput.vue";
 import BaseButton from "@/components/ui/Login/BaseButton.vue";
+import { useAuth } from "@/composables/useAuth";
 
 const router = useRouter();
 const email = ref("");
@@ -91,6 +92,8 @@ const isLoading = ref(false);
 const emailError = ref("");
 const passwordError = ref("");
 const showSuccessMessage = ref(false);
+const nome = ref("");
+const { register } = useAuth();
 
 const validateEmail = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -121,17 +124,15 @@ const handleSubmit = async () => {
 
   try {
     isLoading.value = true;
-    // Aqui você implementaria a chamada para o backend
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulação de chamada API
 
+    await register(email.value, password.value);
     showSuccessMessage.value = true;
-    
-    // Redireciona para login após 2 segundos
+
     setTimeout(() => {
-      router.push('/login');
+      router.push("/login");
     }, 2000);
   } catch (error) {
-    console.error('Erro ao cadastrar:', error);
+    console.error("Erro ao cadastrar:", error);
   } finally {
     isLoading.value = false;
   }
