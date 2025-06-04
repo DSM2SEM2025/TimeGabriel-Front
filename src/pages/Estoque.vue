@@ -1,89 +1,92 @@
 <template>
-  <div class="p-6">
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+  <div class="p-4 sm:p-6">
+    <!-- Cards estatísticos -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <!-- Total de Produtos -->
       <div
         class="bg-blue-100 p-4 rounded-2xl flex items-center justify-between"
       >
         <div>
           <h3 class="text-sm text-gray-600">Total de Produtos</h3>
-          <p class="text-2xl font-bold">60</p>
+          <p class="text-2xl font-bold">{{ stockStats.totalProducts }}</p>
         </div>
         <CubeIcon class="h-8 w-8 text-blue-500" />
       </div>
 
+      <!-- Produtos com Baixo Estoque -->
       <div
         class="bg-yellow-100 p-4 rounded-2xl flex items-center justify-between"
       >
         <div>
           <h3 class="text-sm text-gray-600">Produtos com Baixo Estoque</h3>
-          <p class="text-2xl font-bold">7</p>
+          <p class="text-2xl font-bold">{{ stockStats.lowStockCount }}</p>
         </div>
         <BellIcon class="h-8 w-8 text-yellow-500" />
       </div>
 
+      <!-- Atualizações de Estoque -->
       <div
         class="bg-green-100 p-4 rounded-2xl flex items-center justify-between"
       >
         <div>
           <h3 class="text-sm text-gray-600">Atualizações de Estoque</h3>
-          <p class="text-2xl font-bold">8</p>
+          <p class="text-2xl font-bold">{{ stockStats.updateCount }}</p>
         </div>
         <RefreshIcon class="h-8 w-8 text-green-500" />
       </div>
     </div>
 
-    <!-- Navegação das abas -->
     <TabGroup>
       <div class="flex flex-col">
-        <TabList class="flex space-x-1 rounded-xl bg-purple-100 p-1 mb-6">
-          <Tab v-slot="{ selected }">
-            <button
-              class="w-full rounded-lg py-2.5 text-sm font-medium leading-5 px-6"
-              :class="[
-                'focus:outline-none',
-                selected
-                  ? 'bg-white text-purple-700 shadow'
-                  : 'text-purple-600 hover:bg-white/[0.12] hover:text-purple-700'
-              ]"
-            >
-              Estoque Atual
-            </button>
-          </Tab>
-          <Tab v-slot="{ selected }">
-            <button
-              class="w-full rounded-lg py-2.5 text-sm font-medium leading-5 px-6"
-              :class="[
-                'focus:outline-none',
-                selected
-                  ? 'bg-white text-purple-700 shadow'
-                  : 'text-purple-600 hover:bg-white/[0.12] hover:text-purple-700'
-              ]"
-            >
-              Histórico de Atualizações
-            </button>
-          </Tab>
-        </TabList>
-              <!-- Pesquisa e filtros -->
+        <div class="overflow-x-auto">
+          <TabList class="flex space-x-1 rounded-xl bg-purple-100 p-1 mb-6 min-w-max">
+            <Tab v-slot="{ selected }">
+              <button
+                class="rounded-lg py-2.5 text-sm font-medium leading-5 px-4 sm:px-6 whitespace-nowrap"
+                :class="[
+                  'focus:outline-none',
+                  selected
+                    ? 'bg-white text-purple-700 shadow'
+                    : 'text-purple-600 hover:bg-white/[0.12] hover:text-purple-700'
+                ]"
+              >
+                Estoque Atual
+              </button>
+            </Tab>
+            <Tab v-slot="{ selected }">
+              <button
+                class="rounded-lg py-2.5 text-sm font-medium leading-5 px-4 sm:px-6 whitespace-nowrap"
+                :class="[
+                  'focus:outline-none',
+                  selected
+                    ? 'bg-white text-purple-700 shadow'
+                    : 'text-purple-600 hover:bg-white/[0.12] hover:text-purple-700'
+                ]"
+              >
+                Histórico de Atualizações
+              </button>
+            </Tab>
+          </TabList>
+        </div>
+
         <TabPanels class="flex-1">
           <TabPanel>
-            <div class="space-y-6">
-              <div class="flex flex-wrap items-center gap-4">
-                <div class="flex-1 relative">
-                  <SearchIcon
-                    class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"
-                  />
+            <div class="space-y-4 sm:space-y-6">
+              <div class="flex flex-col sm:flex-row gap-4">
+                <div class="w-full sm:w-1/2 flex items-center bg-white rounded-lg border border-gray-200 focus-within:ring-2 focus-within:ring-purple-300">
+                  <SearchIcon class="h-5 w-5 text-gray-400 ml-3 flex-shrink-0" />
                   <input
                     type="text"
-                    placeholder="Procurar Produtos por Nome ou Fornecedor"
                     v-model="searchQuery"
-                    class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                    placeholder="Procurar Produtos..."
+                    class="w-full py-2 px-3 focus:outline-none rounded-lg"
                   />
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap gap-2 sm:gap-4">
                   <select
                     v-model="selectedCategory"
-                    class="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                    class="flex-1 sm:flex-none px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 text-sm"
                   >
                     <option value="">Categorias</option>
                     <option
@@ -97,7 +100,7 @@
 
                   <select
                     v-model="selectedStatus"
-                    class="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                    class="flex-1 sm:flex-none px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 text-sm"
                   >
                     <option value="">Status</option>
                     <option
@@ -111,32 +114,33 @@
 
                   <button
                     @click="clearFilters"
-                    class="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50"
+                    class="w-full sm:w-auto px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-sm"
                   >
                     Limpar Filtros
                   </button>
                 </div>
               </div>
 
-              <!-- Tabela do Inventário -->
+              <!-- Tabela -->
               <div class="bg-white rounded-xl shadow overflow-hidden">
-                <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <div class="p-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <h2 class="text-lg font-semibold">Inventário</h2>
                   <button
                     @click="navigateToProdutos"
-                    class="inline-flex items-center px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                    class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
                   >
                     <PlusIcon class="h-5 w-5 mr-2" />
                     Adicionar Produto
                   </button>
                 </div>
 
+                <!-- Tabela Responsiva -->
                 <div class="overflow-x-auto">
                   <table class="w-full">
                     <thead class="bg-gray-50">
                       <tr>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                          Nome do Produto/Fornecedor
+                        <th class="px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-600">
+                          Produto/Fornecedor
                         </th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
                           Categoria
@@ -159,15 +163,11 @@
                       </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                      <tr
-                        v-for="item in paginatedItems"
-                        :key="item.id"
-                        class="hover:bg-gray-50"
-                      >
+                      <tr v-for="item in paginatedItems" :key="item.id" class="hover:bg-gray-50">
                         <td class="px-4 py-3">
-                          <div>
-                            <p class="font-medium">{{ item.name }}</p>
-                            <p class="text-sm text-gray-500">{{ item.supplier }}</p>
+                          <div class="max-w-xs sm:max-w-none">
+                            <p class="font-medium truncate">{{ item.name }}</p>
+                            <p class="text-xs sm:text-sm text-gray-500 truncate">{{ item.supplier }}</p>
                           </div>
                         </td>
                         <td class="px-4 py-3 text-sm">{{ item.category }}</td>
@@ -206,15 +206,15 @@
                   </table>
                 </div>
 
-                <!-- Controle de paginação -->
+                <!-- Paginação -->
                 <div class="p-4 border-t border-gray-200">
                   <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="flex items-center gap-2">
-                      <span class="text-sm text-gray-600">Itens por página:</span>
+                    <div class="flex items-center gap-2 text-sm">
+                      <span class="text-gray-600">Itens por página:</span>
                       <select
                         v-model="itemsPerPage"
                         @change="handleItemsPerPageChange($event.target.value)"
-                        class="border rounded-md px-2 py-1 text-sm"
+                        class="border rounded-md px-2 py-1"
                       >
                         <option
                           v-for="option in itemsPerPageOptions"
@@ -226,18 +226,17 @@
                       </select>
                     </div>
 
-                    <div class="text-sm text-gray-600">
-                      Página {{ currentPage }} de {{ totalPages }} 
-                      ({{ paginatedItems.length }} itens)
+                    <div class="text-sm text-gray-600 text-center">
+                      Página {{ currentPage }} de {{ totalPages }}
+                      <span class="hidden sm:inline">({{ paginatedItems.length }} itens)</span>
                     </div>
 
-                    <!-- Botão de página -->
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap justify-center gap-2">
                       <button
                         v-for="page in totalPages"
                         :key="page"
                         @click="handlePageChange(page)"
-                        class="px-3 py-1 rounded-md text-sm"
+                        class="px-3 py-1 rounded-md text-sm min-w-[2.5rem]"
                         :class="[
                           currentPage === page
                             ? 'bg-purple-500 text-white'
@@ -253,28 +252,18 @@
             </div>
           </TabPanel>
 
-          <!-- Histórico Panel -->
+          <!-- Historico de atualizações -->
           <TabPanel>
-            <div class="bg-white rounded-xl shadow">
-              <div class="p-4 border-b border-gray-200">
-                <h2 class="text-lg font-semibold">Histórico de Atualizações</h2>
-              </div>
-
+            <div class="bg-white rounded-xl shadow overflow-hidden">
               <div class="divide-y divide-gray-200">
                 <div v-for="update in recentUpdates" :key="update.id" class="p-4">
-                  <div class="grid grid-cols-4 gap-4">
-                    <div>{{ update.productName }}</div>
-                    <div
-                      :class="
-                        update.quantity.startsWith('-')
-                          ? 'text-red-600'
-                          : 'text-green-600'
-                      "
-                    >
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+                    <div class="font-medium">{{ update.productName }}</div>
+                    <div :class="update.quantity.startsWith('-') ? 'text-red-600' : 'text-green-600'">
                       {{ update.quantity }}
                     </div>
-                    <div>{{ update.date }}</div>
-                    <div class="text-right">{{ update.updatedBy }}</div>
+                    <div class="text-sm text-gray-500">{{ update.date }}</div>
+                    <div class="text-right text-sm text-gray-500">{{ update.updatedBy }}</div>
                   </div>
                 </div>
               </div>
@@ -319,7 +308,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
+import { onMounted, onUnmounted, ref, computed, watch } from "vue";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
 import {
   CubeIcon,
@@ -332,7 +321,8 @@ import {
   PlusIcon,
 } from "@heroicons/vue/outline";
 import { useRouter } from 'vue-router';
-import ModifyProductModal from "../components/ui/ModifyProductModal.vue";
+import ModifyProductModal from "../components/ui/Estoque/ModifyProductModal.vue";
+import { useEstoque } from '@/composables/useEstoque'
 
 const router = useRouter();
 
@@ -408,6 +398,22 @@ const recentUpdates = ref([
     updatedBy: "Admin",
   },
 ]);
+
+const { stockStats, fetchStockStats, initializeRealTimeUpdates } = useEstoque()
+
+// Fetch inicial dos dados
+onMounted(async () => {
+  await fetchStockStats()
+  
+  // Inicializa WebSocket para atualizações em tempo real
+  const ws = initializeRealTimeUpdates()
+  
+  onUnmounted(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.close()
+    }
+  })
+})
 
 const filteredItems = computed(() => {
   let items = inventory.value;

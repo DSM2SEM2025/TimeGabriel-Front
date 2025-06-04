@@ -2,27 +2,12 @@
   <header class="bg-white border-b border-gray-200 h-16 flex items-center px-6">
     <h1 class="text-xl md:text-2xl font-bold truncate">{{ title }}</h1>
 
-    <div class="flex items-center ml-auto gap-2">
-      <div class="relative hidden md:block mr-4">
-        <input
-          type="text"
-          placeholder="Pesquisar"
-          class="bg-gray-100 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-purple-300 w-48 lg:w-64"
-        />
-        <SearchIcon class="h-5 w-5 text-gray-500 absolute left-3 top-2.5" />
-      </div>
-
-      <button
-        @click="toggleMobileSearch"
-        class="md:hidden p-2 hover:bg-gray-100 rounded-full"
-      >
-        <SearchIcon class="h-5 w-5 text-gray-600" />
-      </button>
-
+    <div class="flex items-center ml-auto gap-4">
+      <!-- Notificações -->
       <div class="relative">
         <button
           @click.stop="toggleNotifications"
-          class="relative flex items-center justify-center h-8 w-8 hover:bg-gray-100 rounded-full"
+          class="relative flex items-center justify-center h-10 w-10 hover:bg-gray-100 rounded-full transition-colors"
         >
           <BellIcon class="h-6 w-6 text-gray-600" />
           <span
@@ -43,8 +28,8 @@
         >
           <div
             v-if="showNotifications"
-            class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg py-1 z-50 max-h-[calc(100vh-80px)] overflow-y-auto"
-            style="top: 100%"
+            class="fixed sm:absolute right-4 left-4 sm:left-auto sm:right-0 mt-2 sm:w-80 bg-white rounded-lg shadow-lg py-1 z-50 max-h-[80vh] sm:max-h-[calc(100vh-80px)] overflow-y-auto"
+            style="top: 3.5rem"
             @click.stop
           >
             <div
@@ -111,37 +96,15 @@
         </Transition>
       </div>
 
+      <!-- Botão de Logout-->
       <button
         @click="handleLogout"
-        class="flex items-center justify-center h-8 w-8 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full"
+        class="flex items-center justify-center h-10 w-10 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
+        title="Sair"
       >
         <LogoutIcon class="h-6 w-6" />
       </button>
     </div>
-
-    <!-- Barra de pesquisa mobile -->
-    <Transition
-      enter-active-class="transition ease-out duration-100"
-      enter-from-class="transform opacity-0 -translate-y-4"
-      enter-to-class="transform opacity-100 translate-y-0"
-      leave-active-class="transition ease-in duration-75"
-      leave-from-class="transform opacity-100 translate-y-0"
-      leave-to-class="transform opacity-0 -translate-y-4"
-    >
-      <div
-        v-if="showMobileSearch"
-        class="absolute top-16 left-0 right-0 bg-white p-4 shadow-lg z-40 md:hidden"
-      >
-        <div class="relative">
-          <input
-            type="text"
-            placeholder="Pesquisar"
-            class="w-full bg-gray-100 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-purple-300"
-          />
-          <SearchIcon class="h-5 w-5 text-gray-500 absolute left-3 top-2.5" />
-        </div>
-      </div>
-    </Transition>
   </header>
 </template>
 
@@ -149,7 +112,6 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
-  SearchIcon,
   BellIcon,
   LogoutIcon,
   ExclamationIcon,
