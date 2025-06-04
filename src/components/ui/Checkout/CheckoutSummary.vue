@@ -23,19 +23,24 @@
           <div class="flex flex-col items-end gap-1">
             <div class="flex items-center gap-2">
               <button 
-                class="w-8 h-8 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700"
+                class="w-8 h-8 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700 text-lg"
                 @click="decrementar(index)"
               >
+                −
               </button>
+
               <span class="w-8 text-center">{{ item.quantidade || 1 }}</span>
+
               <button 
-                class="w-8 h-8 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700"
+                class="w-8 h-8 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700 text-lg"
                 @click="incrementar(index)"
               >
                 +
               </button>
             </div>
-            <div class="font-semibold">R$ {{ formatarPreco(item.preco * (item.quantidade || 1)) }}</div>
+            <div class="font-semibold">
+              R$ {{ formatarPreco(item.preco * (item.quantidade || 1)) }}
+            </div>
           </div>
         </div>
         <button

@@ -5,7 +5,8 @@
       Procurar Produto
     </h2>
     <input
-      v-model="search"
+      :value="modelValue"
+      @input="onInput"
       type="text"
       @keyup.enter="adicionarProduto"
       placeholder="Procurar Produtos por Nome"
@@ -21,23 +22,30 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { defineEmits, defineProps } from 'vue'
 import { SearchIcon } from '@heroicons/vue/outline'
 
-const emit = defineEmits(['add-to-cart'])
-const search = ref('')
+const props = defineProps({
+  modelValue: String
+})
+
+const emit = defineEmits(['update:modelValue', 'add-to-cart'])
+
+function onInput(event) {
+  emit('update:modelValue', event.target.value)
+}
 
 function adicionarProduto() {
-  if (!search.value) return
+  if (!props.modelValue) return
 
   const produtoMock = {
     id: Date.now(),
-    nome: search.value,
+    nome: props.modelValue,
     preco: Math.floor(Math.random() * 100) + 1,
     estoque: Math.floor(Math.random() * 50) + 1
   }
 
   emit('add-to-cart', produtoMock)
-  search.value = ''
+  emit('update:modelValue', '') 
 }
 </script>
