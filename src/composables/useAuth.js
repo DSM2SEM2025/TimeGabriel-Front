@@ -40,35 +40,34 @@ loadStoredAuth();
 
 export function useAuth() {
   const login = async (email, password) => {
-    isLoading.value = true;
-    error.value = null;
+  isLoading.value = true;
+  error.value = null;
 
-    try {
-      const response = await api.post("/login", {
-        email_usuario: email,
-        senha_usuario: password,
-      });
+  try {
+    const response = await api.post("/login", {
+      email_usuario: email,
+      senha_usuario: password,
+    });
 
-      const { access_token, usuario } = response.data;
+    const { access_token } = response.data;
 
-      // Salva token e usuário
-      localStorage.setItem("token", access_token);
-      localStorage.setItem("user", JSON.stringify(usuario));
+    localStorage.setItem("token", access_token);
+    api.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
 
-      user.value = usuario;
-      isAuthenticated.value = true;
+    // Se quiser pegar o payload do token para setar o user, pode decodificar aqui:
+    const payload = JSON.parse(atob(access_token.split('.')[1]));
+    user.value = { id: payload.id, email: payload.email };
 
-      // Configura token nas chamadas futuras
-      api.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+    isAuthenticated.value = true;
+    return true;
+  } catch (e) {
+    error.value = e.response?.data?.detail || "Erro no login";
+    throw new Error(error.value);
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-      return true;
-    } catch (e) {
-      error.value = e.response?.data?.detail || "Erro no login";
-      throw new Error(error.value);
-    } finally {
-      isLoading.value = false;
-    }
-  };
 
   const logout = () => {
     user.value = null;

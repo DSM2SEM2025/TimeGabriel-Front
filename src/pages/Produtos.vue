@@ -205,6 +205,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import api from '@/services/api';
 
 const router = useRouter();
 const categories = ["Alimentos", "Bebidas", "Laticínios"];
@@ -225,10 +226,36 @@ const automatedForm = ref({
   invoiceLink: ''
 });
 
-const handleManualRegister = () => {
-  // Implementar lógica de registro manual
-    //Aqui entra o backend
-  console.log('Produto registrado:', manualForm.value);
+const handleManualRegister = async () => {
+  try {
+    const produto = {
+      nome_produto: manualForm.value.name,
+      preco_produto: manualForm.value.price,
+      desc_produto: manualForm.value.description,
+      numero_nf_produto: manualForm.value.barcode,
+      validade_produto: new Date(manualForm.value.expiryDate).toISOString().split('T')[0],
+      fornecedor_produto: manualForm.value.supplier,
+      qtd_minima_produto: manualForm.value.minQuantity,
+    };
+
+    const estoque = {
+      categoria_estoque: manualForm.value.category,
+      qtde_estoque: manualForm.value.initialQuantity,
+    };
+
+    console.log("Enviando:", { produto, estoque });
+
+    const response = await api.post('/produto', {
+      produto, 
+      estoque
+    });
+
+    alert(response.data.message || 'Produto cadastrado com sucesso!');
+    resetForm();
+  } catch (error) {
+    console.error(error);
+    alert(error.response?.data?.detail || 'Erro ao cadastrar produto.');
+  }
 };
 
 const handleAutomatedRegister = () => {
@@ -238,7 +265,7 @@ const handleAutomatedRegister = () => {
 };
 
 const resetForm = () => {
-  if (confirm('Deseja cancelar o registro?')) {
+  if (confirm('Deseja apagar os dados diigtados?')) {
     manualForm.value = {
       name: '',
       category: '',
