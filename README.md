@@ -44,13 +44,17 @@ npm run preview
 
 ```
 src/
-├── assets/         # Arquivos estáticos (CSS, imagens)
-├── components/     # Componentes Vue reutilizáveis
-│   ├── layout/    # Componentes de layout
-│   └── ui/        # Componentes de interface
-├── composables/   # Composables Vue (lógica reutilizável)
-├── pages/         # Componentes de página
-└── router/        # Configuração das rotas
+├── main.js                # Arquivo principal
+├── App.vue               # Componente raiz
+├── assets/              # Arquivos estáticos
+│
+├── components/          # Componentes reutilizáveis
+│   ├── layout/         # Componentes de layout
+│   └── ui/            # Componentes de interface
+│
+├── composables/        # Lógica reutilizável
+├── pages/             # Páginas da aplicação
+└── router/            # Configuração de rotas
 ```
 
 ## Tecnologias Utilizadas
