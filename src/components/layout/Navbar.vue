@@ -126,7 +126,6 @@ const router = useRouter();
 const { logout } = useAuth();
 const { notifications, unreadCount, markAllAsRead } = useNotifications();
 const showNotifications = ref(false);
-const showMobileSearch = ref(false);
 
 const title = computed(() => {
   return route.meta.title || "Dashboard";
