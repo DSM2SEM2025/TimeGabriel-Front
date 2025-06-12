@@ -16,7 +16,7 @@ defineProps({
   title: String,
   description: String,
   color: String,
-  icon: Object
+  icon: [Object, String, Function], // <-- Aqui está o fix
 });
 
 defineEmits(['click']);
