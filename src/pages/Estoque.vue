@@ -308,7 +308,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, computed, watch } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
 import {
   CubeIcon,
@@ -322,49 +322,19 @@ import {
 } from "@heroicons/vue/outline";
 import { useRouter } from 'vue-router';
 import ModifyProductModal from "../components/ui/Estoque/ModifyProductModal.vue";
-import { useEstoque } from '@/composables/useEstoque'
+import { estoqueApi } from '@/services/api';
 
 const router = useRouter();
 
-const navigateToProdutos = () => {
-  router.push('/produtos');
-};
-
-// Depois mudar para chamar no backend
-const inventory = ref([
-  {
-    id: 1,
-    name: "Arroz Integral",
-    supplier: "Camil",
-    category: "Alimentos",
-    quantity: 25,
-    minQuantity: 10,
-    status: "Em Estoque",
-    expiryDate: "27/12/2025",
-  },
-  {
-    id: 2,
-    name: "Biscoito Cream Cracker",
-    supplier: "Vitarella",
-    category: "Alimentos",
-    quantity: 3,
-    minQuantity: 10,
-    status: "Baixo Estoque",
-    expiryDate: "27/04/2025",
-  },
-  {
-    id: 3,
-    name: "Leite Integral",
-    supplier: "Betânia",
-    category: "Laticínios",
-    quantity: 15,
-    minQuantity: 5,
-    status: "Em Estoque",
-    expiryDate: "05/06/2025", 
-  },
-]);
-
-const categories = ["Alimentos", "Bebidas", "Laticínios"];
+// Dados reativos
+const inventory = ref([]);
+const stockStats = ref({
+  totalProducts: 0,
+  lowStockCount: 0,
+  updateCount: 0
+});
+const recentUpdates = ref([]);
+const categories = ref([]);
 const searchQuery = ref("");
 const selectedCategory = ref("");
 const statusOptions = [
@@ -374,51 +344,65 @@ const statusOptions = [
   "Baixo Estoque (Expirando)"
 ];
 const selectedStatus = ref("");
-//Depois mudar para chamar no backend
-const recentUpdates = ref([
-  {
-    id: 1,
-    productName: "Arroz Integral",
-    quantity: "+25",
-    date: "27/04/2025 10:30",
-    updatedBy: "Admin",
-  },
-  {
-    id: 2,
-    productName: "Biscoito Cream Cracker",
-    quantity: "-7",
-    date: "27/04/2025 09:45",
-    updatedBy: "Admin",
-  },
-  {
-    id: 3,
-    productName: "Leite Integral",
-    quantity: "+15",
-    date: "26/04/2025 14:20",
-    updatedBy: "Admin",
-  },
-]);
 
-const { stockStats, fetchStockStats, initializeRealTimeUpdates } = useEstoque()
+// Paginação
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+const itemsPerPageOptions = [10, 20, 50];
 
-// Fetch inicial dos dados
+// Modal e menus
+const selectedItem = ref(null);
+const showActionsMenu = ref(false);
+const actionMenuPosition = ref({ x: 0, y: 0 });
+const showModifyModal = ref(false);
+
+// Carregar dados iniciais
 onMounted(async () => {
-  await fetchStockStats()
-  
-  // Inicializa WebSocket para atualizações em tempo real
-  const ws = initializeRealTimeUpdates()
-  
-  onUnmounted(() => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.close()
-    }
-  })
-})
+  await loadData();
+});
 
+async function loadData() {
+  try {
+    // Carrega produtos usando a API configurada
+    const produtos = await estoqueApi.getProdutos();
+    
+    inventory.value = produtos.map(p => ({
+      id: p.id_produto,
+      name: p.nome_produto,
+      supplier: p.fornecedor_produto,
+      category: p.categoria_estoque,
+      quantity: p.qtde_estoque,
+      minQuantity: p.qtd_minima_produto,
+      status: p.qtde_estoque >= p.qtd_minima_produto ? "Em Estoque" : "Baixo Estoque",
+      expiryDate: formatDate(p.validade_produto),
+      price: p.preco_produto,
+      description: p.desc_produto,
+      invoiceNumber: p.numero_nf_produto
+    }));
+
+    // Extrai categorias únicas
+    categories.value = [...new Set(inventory.value.map(item => item.category))];
+
+    // Calcula estatísticas usando a API configurada
+    stockStats.value = await estoqueApi.getStockStats();
+    
+    // Aqui você pode carregar recentUpdates se tiver um endpoint para isso
+  } catch (error) {
+    console.error("Erro ao carregar dados:", error);
+    // Você pode adicionar aqui um tratamento de erro mais sofisticado
+  }
+}
+
+function formatDate(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('pt-BR');
+}
+
+// Filtros e computeds
 const filteredItems = computed(() => {
   let items = inventory.value;
 
-  // filtro de pesquisa
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
     items = items.filter(
@@ -428,12 +412,10 @@ const filteredItems = computed(() => {
     );
   }
 
-  // Categorias filtro
   if (selectedCategory.value) {
     items = items.filter((item) => item.category === selectedCategory.value);
   }
 
-  // Status filtro
   if (selectedStatus.value) {
     items = items.filter((item) => {
       const isExpiring = checkExpiryStatus(item.expiryDate);
@@ -445,10 +427,6 @@ const filteredItems = computed(() => {
   return items;
 });
 
-const currentPage = ref(1);
-const itemsPerPage = ref(10);
-const itemsPerPageOptions = [10, 20, 50];
-
 const paginatedItems = computed(() => {
   const startIndex = (currentPage.value - 1) * itemsPerPage.value;
   return filteredItems.value.slice(startIndex, startIndex + itemsPerPage.value);
@@ -458,16 +436,12 @@ const totalPages = computed(() => {
   return Math.ceil(filteredItems.value.length / itemsPerPage.value);
 });
 
+// Métodos
 const clearFilters = () => {
   searchQuery.value = "";
   selectedCategory.value = "";
   selectedStatus.value = "";
 };
-
-const selectedItem = ref(null);
-const showActionsMenu = ref(false);
-const actionMenuPosition = ref({ x: 0, y: 0 });
-const showModifyModal = ref(false);
 
 const openActionsMenu = (item, event) => {
   event.preventDefault();
@@ -498,40 +472,53 @@ const handleModify = (item) => {
   showActionsMenu.value = false;
 };
 
-const handleSaveModification = (updatedProduct) => {
-  inventory.value = inventory.value.map(item => 
-    item.id === updatedProduct.id ? updatedProduct : item
-  );
+const handleSaveModification = async (updatedProduct) => {
+  try {
+    const produtoData = {
+      id_produto: updatedProduct.id,
+      nome_produto: updatedProduct.name,
+      preco_produto: updatedProduct.price || 0,
+      desc_produto: updatedProduct.description || '',
+      numero_nf_produto: updatedProduct.invoiceNumber || '',
+      validade_produto: updatedProduct.expiryDate,
+      fornecedor_produto: updatedProduct.supplier,
+      qtd_minima_produto: updatedProduct.minQuantity
+    };
 
-  recentUpdates.value.unshift({
-    id: Date.now(),
-    productName: updatedProduct.name,
-    quantity: `${updatedProduct.quantity}`,
-    date: new Date().toLocaleDateString('pt-BR'),
-    updatedBy: "Admin"
-  });
-
-  showModifyModal.value = false;
+const estoqueData = {
+  id_estoque: updatedProduct.id_estoque,
+  qtde_estoque: updatedProduct.quantity,
+  categoria_estoque: updatedProduct.category
 };
 
-const handleDelete = (item) => {
-  if (confirm(`Tem certeza que deseja deletar ${item.name}?`)) {
-    inventory.value = inventory.value.filter(p => p.id !== item.id);
+await estoqueApi.updateProduto(produtoData, estoqueData);
+showModifyModal.value = false;
 
-    recentUpdates.value.unshift({
-      id: Date.now(),
-      productName: item.name,
-      quantity: "Removido",
-      date: new Date().toLocaleDateString('pt-BR'),
-      updatedBy: "Admin"
-    });
+    // Recarrega os dados após a atualização
+    await loadData();
+    
+    showModifyModal.value = false;
+  } catch (error) {
+    console.error("Erro ao salvar modificação:", error);
+    // Você pode adicionar aqui uma notificação para o usuário
+  }
+};
+
+const handleDelete = async (item) => {
+  try {
+    await estoqueApi.deleteProduto(item.id);
+    await loadData();
+  } catch (error) {
+    console.error("Erro ao deletar:", error);
   }
   showActionsMenu.value = false;
 };
 
 const checkExpiryStatus = (expiryDate) => {
+  if (!expiryDate) return false;
+  
   const today = new Date();
-  const expiry = new Date(expiryDate.split("/").reverse().join("-"));
+  const expiry = new Date(expiryDate.split('/').reverse().join('-'));
   const diffTime = expiry - today;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays <= 7;
@@ -544,6 +531,10 @@ const handlePageChange = (page) => {
 const handleItemsPerPageChange = (value) => {
   itemsPerPage.value = Number(value);
   currentPage.value = 1; 
+};
+
+const navigateToProdutos = () => {
+  router.push('/produtos');
 };
 
 watch([searchQuery, selectedCategory, selectedStatus], () => {

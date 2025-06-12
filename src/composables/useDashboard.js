@@ -12,15 +12,18 @@ export function useDashboard() {
     productOutputTrend: "",
   });
 
-  const fetchDashboardStats = async () => {
-    try {
-      const response = await fetch("/api/dashboard/stats");
-      const data = await response.json();
-      updateStats(data);
-    } catch (error) {
-      console.error("Erro ao buscar estatísticas:", error);
+const fetchDashboardStats = async () => {
+  try {
+    const response = await fetch("http://localhost:8000/api/dashboard/stats");
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
     }
-  };
+    const data = await response.json();
+    updateStats(data);
+  } catch (error) {
+    console.error("Erro ao buscar estatísticas:", error);
+  }
+};
 
   const updateStats = (data) => {
     dashboardStats.value = {
@@ -39,7 +42,7 @@ export function useDashboard() {
   let ws = null;
 
   const initializeWebSocket = () => {
-    ws = new WebSocket("seu_websocket_url");
+  ws = new WebSocket("ws://localhost:8000/ws/dashboard");
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
