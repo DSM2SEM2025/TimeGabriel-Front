@@ -366,18 +366,20 @@ async function loadData() {
     // Carrega produtos usando a API configurada
     const produtos = await estoqueApi.getProdutos();
     
+    console.log("Dados recebidos:", produtos);
+
     inventory.value = produtos.map(p => ({
-      id: p.id_produto,
-      name: p.nome_produto,
-      supplier: p.fornecedor_produto,
-      category: p.categoria_estoque,
-      quantity: p.qtde_estoque,
-      minQuantity: p.qtd_minima_produto,
-      status: p.qtde_estoque >= p.qtd_minima_produto ? "Em Estoque" : "Baixo Estoque",
-      expiryDate: formatDate(p.validade_produto),
-      price: p.preco_produto,
-      description: p.desc_produto,
-      invoiceNumber: p.numero_nf_produto
+      id: p.ID_PRODUTO,
+      name: p.NOME_PRODUTO,
+      supplier: p.FORNECEDOR_PRODUTO,
+      category: p.CATEGORIA_ESTOQUE,
+      quantity: p.QTDE_ESTOQUE,
+      minQuantity: p.QTD_MINIMA_PRODUTO,
+      expiryDate: formatDate(p.VALIDADE_PRODUTO),
+      price: p.PRECO_PRODUTO,
+      description: p.DESC_PRODUTO,
+      invoiceNumber: p.NUMERO_NF_PRODUTO
+
     }));
 
     // Extrai categorias únicas
