@@ -389,7 +389,11 @@ async function loadData() {
     categories.value = [...new Set(inventory.value.map(item => item.category))];
 
     // Calcula estatísticas usando a API configurada
-    stockStats.value = await estoqueApi.getStockStats();
+    stockStats.value = {
+      totalProducts: inventory.value.length,
+      lowStockCount: inventory.value.filter(item => item.quantity < item.minQuantity).length,
+      updateCount: 0
+    };
     
     // Aqui você pode carregar recentUpdates se tiver um endpoint para isso
   } catch (error) {
@@ -400,14 +404,46 @@ async function loadData() {
 
 function formatDate(dateString) {
   if (!dateString) return '';
+  
+  // Se a data estiver no formato ISO (yyyy-mm-dd)
+  if (dateString.includes('-')) {
+    const [year, month, day] = dateString.split('-');
+    return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+  }
+  
+  // Se já estiver no formato dd/mm/yyyy, retorna direto
+  if (dateString.includes('/')) {
+    return dateString;
+  }
+  
+  // Para outros formatos (como Date object do JavaScript)
   const date = new Date(dateString);
-  return date.toLocaleDateString('pt-BR'); // dd/MM/yyyy
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 }
 
 function formatDateISO(dateString) {
   if (!dateString) return '';
+  
+  // Se já estiver no formato ISO (yyyy-mm-dd), retorna direto
+  if (dateString.includes('-')) {
+    return dateString;
+  }
+  
+  // Converte de dd/mm/yyyy para yyyy-mm-dd
+  if (dateString.includes('/')) {
+    const [day, month, year] = dateString.split('/');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  }
+  
+  // Para outros formatos
   const date = new Date(dateString);
-  return date.toISOString().split('T')[0]; // yyyy-MM-dd
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 
@@ -489,53 +525,61 @@ const handleModify = (item) => {
 
 const handleSaveModification = async (updatedProduct) => {
   try {
-    // Formatar validade_produto antes de enviar para a API
-    const formattedExpiryDate = updatedProduct.expiryDate
-      ? updatedProduct.expiryDate.split('/').reverse().join('-')
-      : null;
+    // Verificação adicional de segurança
+    if (!updatedProduct.id || !updatedProduct.id_estoque) {
+      throw new Error('IDs do produto e estoque são obrigatórios');
+    }
 
-  const produtoData = {
-    id_produto: updatedProduct.id,
-    nome_produto: updatedProduct.name,
-    preco_produto: updatedProduct.price || 0,
-    desc_produto: updatedProduct.description || '',
-    numero_nf_produto: updatedProduct.invoiceNumber || '',
-    validade_produto: formattedExpiryDate,
-    fornecedor_produto: updatedProduct.supplier,
-    qtd_minima_produto: updatedProduct.minQuantity
-  };
+    const produtoData = {
+      id_produto: updatedProduct.id,
+      nome_produto: updatedProduct.name,
+      preco_produto: updatedProduct.price,
+      desc_produto: updatedProduct.description,
+      numero_nf_produto: updatedProduct.invoiceNumber,
+      validade_produto: updatedProduct.expiryDate,
+      fornecedor_produto: updatedProduct.supplier,
+      qtd_minima_produto: updatedProduct.minQuantity
+    };
 
-const estoqueData = {
-  id_estoque: updatedProduct.id_estoque,
-  qtde_estoque: updatedProduct.quantity,
-  categoria_estoque: updatedProduct.category
-};
+    const estoqueData = {
+      id_estoque: updatedProduct.id_estoque,
+      qtde_estoque: updatedProduct.quantity,
+      categoria_estoque: updatedProduct.category
+    };
 
-
-    // Enviar os dados para a API
+    console.log('Enviando para API:', { produto: produtoData, estoque: estoqueData });
+    
     await estoqueApi.updateProduto({
       produto: produtoData,
       estoque: estoqueData
     });
 
-    // Recarregar os dados após a atualização
     await loadData();
-    
     showModifyModal.value = false;
   } catch (error) {
-    console.error("Erro ao salvar modificação:", error);
-    // Você pode adicionar aqui uma notificação para o usuário
+    console.error('Erro na atualização:', error);
+    alert(`Falha na atualização: ${error.message}`);
   }
 };
 
 const handleDelete = async (item) => {
   try {
-    await estoqueApi.deleteProduto(item.id);
+    console.log('Deletando produto com ID:', item.id); 
+    
+    if (!item.id) {
+      throw new Error('ID do produto não encontrado');
+    }
+    
+    await estoqueApi.deleteProduto(item.id_estoque);
     await loadData();
+    showActionsMenu.value = false;
   } catch (error) {
-    console.error("Erro ao deletar:", error);
+    console.error("Erro ao deletar:", {
+      error: error.response?.data,
+      config: error.config
+    });
+    alert(`Falha ao deletar: ${error.response?.data?.detail || error.message}`);
   }
-  showActionsMenu.value = false;
 };
 
 const checkExpiryStatus = (expiryDate) => {

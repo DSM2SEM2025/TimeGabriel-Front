@@ -138,18 +138,25 @@ watch(
   (newProduct) => {
     if (newProduct) {
       form.value = {
+        // IDs (obrigatórios)
+        id: newProduct.id,
+        id_estoque: newProduct.id_estoque,
+        
+        // Campos editáveis
         name: newProduct.name,
         supplier: newProduct.supplier,
         category: newProduct.category,
         quantity: newProduct.quantity,
         minQuantity: newProduct.minQuantity,
-        expiryDate: newProduct.expiryDate, // já no formato yyyy-MM-dd
-        id: newProduct.id,
-        id_estoque: newProduct.id_estoque,
-        preco_produto: newProduct.preco_produto,
-        desc_produto: newProduct.desc_produto,
-        numero_nf_produto: newProduct.numero_nf_produto
+        expiryDate: newProduct.expiryDate,
+        
+        // Campos não editados (mantêm valores originais)
+        price: newProduct.price || 0,
+        desc_produto: newProduct.description || '',
+        numero_nf_produto: newProduct.invoiceNumber || '',
+        // Adicione aqui qualquer outro campo que exista no produto
       };
+      console.log('Formulário inicializado:', form.value);
     }
   },
   { immediate: true }
@@ -157,13 +164,23 @@ watch(
 
 
 const handleSubmit = () => {
+  // Verifique se os IDs estão presentes
+  if (!form.value.id || !form.value.id_estoque) {
+    console.error('IDs faltando no formulário:', {
+      id_produto: form.value.id,
+      id_estoque: form.value.id_estoque
+    });
+    alert('Erro interno: IDs do produto não encontrados');
+    return;
+  }
+
+  // Restante da validação
   if (
     !form.value.name.trim() ||
     !form.value.supplier.trim() ||
     !form.value.category.trim() ||
     form.value.quantity === null ||
-    form.value.minQuantity === null ||
-    !form.value.expiryDate
+    form.value.minQuantity === null
   ) {
     alert("Por favor, preencha todos os campos obrigatórios.");
     return;
@@ -172,13 +189,15 @@ const handleSubmit = () => {
   emit("save", {
     id: form.value.id,
     id_estoque: form.value.id_estoque,
-
-    nome_produto: form.value.name,
-    fornecedor_produto: form.value.supplier,
-    categoria_estoque: form.value.category,
-    qtde_estoque: form.value.quantity,
-    qtd_minima_produto: form.value.minQuantity,
-    validade_produto: form.value.expiryDate,  // no formato YYYY-MM-DD
+    name: form.value.name,
+    supplier: form.value.supplier,
+    category: form.value.category,
+    quantity: form.value.quantity,
+    minQuantity: form.value.minQuantity,
+    expiryDate: form.value.expiryDate,
+    price: form.value.price || 0,
+    description: form.value.desc_produto || '',
+    invoiceNumber: form.value.numero_nf_produto || ''
   });
 };
 </script>

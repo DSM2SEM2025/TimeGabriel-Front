@@ -45,23 +45,37 @@ export const estoqueApi = {
 
 async updateProduto(data) {
   try {
-    const response = await api.put('/produto', data);
+    console.log("Enviando dados para atualização:", data);
+    const response = await api.put('/produto', data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     return response.data;
   } catch (error) {
-    console.error('Erro ao atualizar produto:', error);
+    console.error('Erro detalhado ao atualizar produto:', {
+      error: error.response?.data,
+      status: error.response?.status,
+      config: error.config
+    });
     throw error;
   }
 },
 
-  async deleteProduto(id) {
-    try {
-      const response = await api.delete(`/produto/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao deletar produto:', error);
-      throw error;
-    }
+async deleteProduto(id) {
+  try {
+    console.log(`Enviando requisição DELETE para /produto/${id}`);
+    const response = await api.delete(`/produto/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao deletar produto:', {
+      error: error.response?.data,
+      status: error.response?.status,
+      config: error.config
+    });
+    throw error;
   }
+}
 };
 
 export default api;

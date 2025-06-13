@@ -104,7 +104,7 @@
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">
-                Código de Barras (opcional)
+                Código da Nota Fiscal
               </label>
               <input
                 v-model="manualForm.barcode"
