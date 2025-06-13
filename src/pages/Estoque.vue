@@ -370,16 +370,19 @@ async function loadData() {
 
     inventory.value = produtos.map(p => ({
       id: p.ID_PRODUTO,
+      id_estoque: p.ID_ESTOQUE,
       name: p.NOME_PRODUTO,
       supplier: p.FORNECEDOR_PRODUTO,
       category: p.CATEGORIA_ESTOQUE,
       quantity: p.QTDE_ESTOQUE,
       minQuantity: p.QTD_MINIMA_PRODUTO,
-      expiryDate: formatDate(p.VALIDADE_PRODUTO),
+      expiryDate: formatDate(p.VALIDADE_PRODUTO), // para exibir na tela
+      expiryDateISO: formatDateISO(p.VALIDADE_PRODUTO), // para preencher no <input type="date">
       price: p.PRECO_PRODUTO,
       description: p.DESC_PRODUTO,
-      invoiceNumber: p.NUMERO_NF_PRODUTO
+      invoiceNumber: p.NUMERO_NF_PRODUTO,
 
+      status: p.QTDE_ESTOQUE < p.QTD_MINIMA_PRODUTO ? "Baixo Estoque" : "Em Estoque"
     }));
 
     // Extrai categorias únicas
@@ -398,8 +401,15 @@ async function loadData() {
 function formatDate(dateString) {
   if (!dateString) return '';
   const date = new Date(dateString);
-  return date.toLocaleDateString('pt-BR');
+  return date.toLocaleDateString('pt-BR'); // dd/MM/yyyy
 }
+
+function formatDateISO(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0]; // yyyy-MM-dd
+}
+
 
 // Filtros e computeds
 const filteredItems = computed(() => {
@@ -469,23 +479,31 @@ const openActionsMenu = (item, event) => {
 };
 
 const handleModify = (item) => {
-  selectedItem.value = item;
+  selectedItem.value = {
+    ...item,
+    expiryDate: item.expiryDateISO // garante formato yyyy-MM-dd
+  };
   showModifyModal.value = true;
   showActionsMenu.value = false;
 };
 
 const handleSaveModification = async (updatedProduct) => {
   try {
-    const produtoData = {
-      id_produto: updatedProduct.id,
-      nome_produto: updatedProduct.name,
-      preco_produto: updatedProduct.price || 0,
-      desc_produto: updatedProduct.description || '',
-      numero_nf_produto: updatedProduct.invoiceNumber || '',
-      validade_produto: updatedProduct.expiryDate,
-      fornecedor_produto: updatedProduct.supplier,
-      qtd_minima_produto: updatedProduct.minQuantity
-    };
+    // Formatar validade_produto antes de enviar para a API
+    const formattedExpiryDate = updatedProduct.expiryDate
+      ? updatedProduct.expiryDate.split('/').reverse().join('-')
+      : null;
+
+  const produtoData = {
+    id_produto: updatedProduct.id,
+    nome_produto: updatedProduct.name,
+    preco_produto: updatedProduct.price || 0,
+    desc_produto: updatedProduct.description || '',
+    numero_nf_produto: updatedProduct.invoiceNumber || '',
+    validade_produto: formattedExpiryDate,
+    fornecedor_produto: updatedProduct.supplier,
+    qtd_minima_produto: updatedProduct.minQuantity
+  };
 
 const estoqueData = {
   id_estoque: updatedProduct.id_estoque,
@@ -493,10 +511,14 @@ const estoqueData = {
   categoria_estoque: updatedProduct.category
 };
 
-await estoqueApi.updateProduto(produtoData, estoqueData);
-showModifyModal.value = false;
 
-    // Recarrega os dados após a atualização
+    // Enviar os dados para a API
+    await estoqueApi.updateProduto({
+      produto: produtoData,
+      estoque: estoqueData
+    });
+
+    // Recarregar os dados após a atualização
     await loadData();
     
     showModifyModal.value = false;

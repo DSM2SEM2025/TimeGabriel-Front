@@ -1,4 +1,4 @@
-<template>
+<template> 
   <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
     <div
       class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
@@ -87,6 +87,10 @@
             </div>
           </div>
 
+          <input type="hidden" v-model="form.id" />
+          <input type="hidden" v-model="form.id_estoque" />
+
+
           <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
             <button
               type="submit"
@@ -113,7 +117,7 @@ import { ref, watch } from "vue";
 
 const props = defineProps({
   show: Boolean,
-  product: Object,
+  product: Object
 });
 
 const emit = defineEmits(["close", "save"]);
@@ -125,6 +129,8 @@ const form = ref({
   quantity: 0,
   minQuantity: 0,
   expiryDate: "",
+  id: null,
+  id_estoque: null
 });
 
 watch(
@@ -132,19 +138,47 @@ watch(
   (newProduct) => {
     if (newProduct) {
       form.value = {
-        ...newProduct,
-        expiryDate: newProduct.expiryDate.split("/").reverse().join("-"),
+        name: newProduct.name,
+        supplier: newProduct.supplier,
+        category: newProduct.category,
+        quantity: newProduct.quantity,
+        minQuantity: newProduct.minQuantity,
+        expiryDate: newProduct.expiryDate, // já no formato yyyy-MM-dd
+        id: newProduct.id,
+        id_estoque: newProduct.id_estoque,
+        preco_produto: newProduct.preco_produto,
+        desc_produto: newProduct.desc_produto,
+        numero_nf_produto: newProduct.numero_nf_produto
       };
     }
   },
   { immediate: true }
 );
 
+
 const handleSubmit = () => {
-  const formattedDate = form.value.expiryDate.split("-").reverse().join("/");
+  if (
+    !form.value.name.trim() ||
+    !form.value.supplier.trim() ||
+    !form.value.category.trim() ||
+    form.value.quantity === null ||
+    form.value.minQuantity === null ||
+    !form.value.expiryDate
+  ) {
+    alert("Por favor, preencha todos os campos obrigatórios.");
+    return;
+  }
+
   emit("save", {
-    ...form.value,
-    expiryDate: formattedDate,
+    id: form.value.id,
+    id_estoque: form.value.id_estoque,
+
+    nome_produto: form.value.name,
+    fornecedor_produto: form.value.supplier,
+    categoria_estoque: form.value.category,
+    qtde_estoque: form.value.quantity,
+    qtd_minima_produto: form.value.minQuantity,
+    validade_produto: form.value.expiryDate,  // no formato YYYY-MM-DD
   });
 };
 </script>

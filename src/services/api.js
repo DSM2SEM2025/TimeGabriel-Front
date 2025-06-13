@@ -43,15 +43,15 @@ export const estoqueApi = {
     }
   },
 
-  async updateProduto(id, dados) {
-    try {
-      const response = await api.put('/produto', dados);
-      return response.data;
-    } catch (error) {
-      console.error('Erro ao atualizar produto:', error);
-      throw error;
-    }
-  },
+async updateProduto(data) {
+  try {
+    const response = await api.put('/produto', data);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao atualizar produto:', error);
+    throw error;
+  }
+},
 
   async deleteProduto(id) {
     try {
