@@ -228,12 +228,18 @@ const automatedForm = ref({
 
 const handleManualRegister = async () => {
   try {
+    // Verifique se todos os campos obrigatórios estão preenchidos
+    if (!manualForm.value.name || !manualForm.value.category || manualForm.value.initialQuantity <= 0) {
+      alert('Por favor, preencha todos os campos obrigatórios!');
+      return;
+    }
+
     const produto = {
       nome_produto: manualForm.value.name,
       preco_produto: manualForm.value.price,
       desc_produto: manualForm.value.description,
       numero_nf_produto: manualForm.value.barcode,
-      validade_produto: new Date(manualForm.value.expiryDate).toISOString().split('T')[0],
+      validade_produto: manualForm.value.expiryDate ? new Date(manualForm.value.expiryDate).toISOString().split('T')[0] : null,
       fornecedor_produto: manualForm.value.supplier,
       qtd_minima_produto: manualForm.value.minQuantity,
     };
@@ -250,11 +256,16 @@ const handleManualRegister = async () => {
       estoque
     });
 
-    alert(response.data.message || 'Produto cadastrado com sucesso!');
+    alert('Produto cadastrado com sucesso!');
     resetForm();
+    router.push('/estoque'); // Redireciona para a página de estoque após cadastro
   } catch (error) {
     console.error(error);
-    alert(error.response?.data?.detail || 'Erro ao cadastrar produto.');
+    if (error.response && error.response.data && error.response.data.detail) {
+      alert(error.response.data.detail);
+    } else {
+      alert('Erro ao cadastrar produto. Verifique o console para mais detalhes.');
+    }
   }
 };
 
