@@ -74,12 +74,6 @@
           Limpar
         </button>
       </div>
-      
-      <button 
-        class="w-full bg-white text-purple-700 py-3 px-4 rounded hover:bg-purple-50"
-      >
-        Imprimir
-      </button>
     </div>
   </div>
 </template>

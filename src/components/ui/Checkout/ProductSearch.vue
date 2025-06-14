@@ -8,16 +8,10 @@
       :value="modelValue"
       @input="onInput"
       type="text"
-      @keyup.enter="adicionarProduto"
+      @keyup.enter="onEnter"
       placeholder="Procurar Produtos por Nome"
       class="w-full p-2 border rounded mb-2"
     />
-    <button
-      class="bg-blue-500 text-white px-4 py-2 rounded w-full"
-      @click="adicionarProduto"
-    >
-      Adicionar Produto
-    </button>
   </div>
 </template>
 
@@ -28,23 +22,16 @@ const props = defineProps({
   modelValue: String
 })
 
-const emit = defineEmits(['update:modelValue', 'add-to-cart'])
+const emit = defineEmits(['update:modelValue', 'search'])
 
 function onInput(event) {
   emit('update:modelValue', event.target.value)
+  emit('search', event.target.value)  // Aqui você emite o termo para o pai buscar no backend
 }
 
-function adicionarProduto() {
-  if (!props.modelValue) return
-
-  const produtoMock = {
-    id: Date.now(),
-    nome: props.modelValue,
-    preco: Math.floor(Math.random() * 100) + 1,
-    estoque: Math.floor(Math.random() * 50) + 1
-  }
-
-  emit('add-to-cart', produtoMock)
-  emit('update:modelValue', '') 
+function onEnter() {
+  // opcional: se quiser buscar só ao pressionar enter, pode usar só essa função
+  emit('search', props.modelValue)
 }
 </script>
+

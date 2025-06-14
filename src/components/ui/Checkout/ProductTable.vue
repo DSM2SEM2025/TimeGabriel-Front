@@ -6,14 +6,8 @@
           <th class="px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-600">
             Nome
           </th>
-          <th class="hidden sm:table-cell px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-600">
-            Categoria
-          </th>
           <th class="px-4 py-3 text-right text-xs sm:text-sm font-medium text-gray-600">
             Preço (R$)
-          </th>
-          <th class="px-4 py-3 text-right text-xs sm:text-sm font-medium text-gray-600">
-            Estoque
           </th>
           <th class="px-4 py-3 text-center text-xs sm:text-sm font-medium text-gray-600">
             Ação
@@ -32,14 +26,8 @@
               <span class="text-xs text-gray-500 sm:hidden">{{ product.categoria }}</span>
             </div>
           </td>
-          <td class="hidden sm:table-cell px-4 py-3 text-sm">
-            {{ product.categoria }}
-          </td>
           <td class="px-4 py-3 text-right text-sm sm:text-base">
             {{ formatPrice(product.preco) }}
-          </td>
-          <td class="px-4 py-3 text-right text-sm sm:text-base">
-            {{ product.estoque }}
           </td>
           <td class="px-4 py-3 text-center">
             <button
@@ -71,6 +59,8 @@ defineProps({
 })
 
 function formatPrice(price) {
-  return price.toFixed(2).replace('.', ',')
+  if (typeof price !== 'number') return ''
+  return price.toFixed(2)
 }
+
 </script>

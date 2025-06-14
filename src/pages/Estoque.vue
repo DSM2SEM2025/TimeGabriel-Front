@@ -53,19 +53,6 @@
                 Estoque Atual
               </button>
             </Tab>
-            <Tab v-slot="{ selected }">
-              <button
-                class="rounded-lg py-2.5 text-sm font-medium leading-5 px-4 sm:px-6 whitespace-nowrap"
-                :class="[
-                  'focus:outline-none',
-                  selected
-                    ? 'bg-white text-purple-700 shadow'
-                    : 'text-purple-600 hover:bg-white/[0.12] hover:text-purple-700'
-                ]"
-              >
-                Histórico de Atualizações
-              </button>
-            </Tab>
           </TabList>
         </div>
 
@@ -323,6 +310,8 @@ import {
 import { useRouter } from 'vue-router';
 import ModifyProductModal from "../components/ui/Estoque/ModifyProductModal.vue";
 import { estoqueApi } from '@/services/api';
+import { eventBus } from '@/services/eventBus';
+
 
 const router = useRouter();
 
@@ -333,6 +322,7 @@ const stockStats = ref({
   lowStockCount: 0,
   updateCount: 0
 });
+const updateCount = ref(0);
 const recentUpdates = ref([]);
 const categories = ref([]);
 const searchQuery = ref("");
@@ -360,6 +350,23 @@ const showModifyModal = ref(false);
 onMounted(async () => {
   await loadData();
 });
+
+eventBus.on('produto-atualizado', (produtoAtualizado) => {
+  const index = inventory.value.findIndex(p => p.id === produtoAtualizado.id_produto);
+  if (index !== -1) {
+    inventory.value[index].quantity = produtoAtualizado.qtde_estoque;
+
+    // Atualiza o status se necessário
+    inventory.value[index].status =
+      produtoAtualizado.qtde_estoque < inventory.value[index].minQuantity
+        ? "Baixo Estoque"
+        : "Em Estoque";
+
+    // Atualiza estatísticas se quiser:
+    stockStats.value.lowStockCount = inventory.value.filter(p => p.quantity < p.minQuantity).length;
+  }
+});
+
 
 async function loadData() {
   try {
@@ -392,10 +399,9 @@ async function loadData() {
     stockStats.value = {
       totalProducts: inventory.value.length,
       lowStockCount: inventory.value.filter(item => item.quantity < item.minQuantity).length,
-      updateCount: 0
+      updateCount: updateCount.value
     };
     
-    // Aqui você pode carregar recentUpdates se tiver um endpoint para isso
   } catch (error) {
     console.error("Erro ao carregar dados:", error);
     // Você pode adicionar aqui um tratamento de erro mais sofisticado
@@ -556,7 +562,11 @@ const handleSaveModification = async (updatedProduct) => {
       estoque: estoqueData
     });
 
+    updateCount.value ++;
     await loadData();
+
+    stockStats.value.updateCount = updateCount.value;
+
     showModifyModal.value = false;
   } catch (error) {
     console.error('Erro na atualização:', error);
