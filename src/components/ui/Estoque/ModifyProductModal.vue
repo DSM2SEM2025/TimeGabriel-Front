@@ -138,24 +138,19 @@ watch(
   (newProduct) => {
     if (newProduct) {
       form.value = {
-        // IDs (obrigatórios)
-        id: newProduct.id,
-        id_estoque: newProduct.id_estoque,
-        
-        // Campos editáveis
-        name: newProduct.name,
-        supplier: newProduct.supplier,
-        category: newProduct.category,
-        quantity: newProduct.quantity,
-        minQuantity: newProduct.minQuantity,
-        expiryDate: newProduct.expiryDate,
-        
-        // Campos não editados (mantêm valores originais)
-        price: newProduct.price || 0,
-        desc_produto: newProduct.description || '',
-        numero_nf_produto: newProduct.invoiceNumber || '',
-        // Adicione aqui qualquer outro campo que exista no produto
-      };
+      id: newProduct.id,
+      id_estoque: newProduct.id_estoque,
+      name: newProduct.name,
+      supplier: newProduct.supplier,
+      category: newProduct.category,
+      quantity: newProduct.quantity,
+      minQuantity: newProduct.minQuantity,
+      expiryDate: newProduct.expiryDate,
+      price: newProduct.price || 0,
+      description: newProduct.description || '',
+      invoiceNumber: newProduct.invoiceNumber || ''
+    };
+
       console.log('Formulário inicializado:', form.value);
     }
   },
@@ -195,9 +190,10 @@ const handleSubmit = () => {
     quantity: form.value.quantity,
     minQuantity: form.value.minQuantity,
     expiryDate: form.value.expiryDate,
-    price: form.value.price || 0,
-    description: form.value.desc_produto || '',
-    invoiceNumber: form.value.numero_nf_produto || ''
-  });
+    price: form.value.price,
+    description: form.value.description,
+    invoiceNumber: form.value.invoiceNumber
+});
+
 };
 </script>

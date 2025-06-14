@@ -496,6 +496,7 @@ const openActionsMenu = (item, event) => {
   event.stopPropagation();
 
   selectedItem.value = item;
+  console.log('Item selecionado no menu:', selectedItem.value);
   showActionsMenu.value = true;
 
   const rect = event.target.getBoundingClientRect();
@@ -538,14 +539,15 @@ const handleSaveModification = async (updatedProduct) => {
       numero_nf_produto: updatedProduct.invoiceNumber,
       validade_produto: updatedProduct.expiryDate,
       fornecedor_produto: updatedProduct.supplier,
-      qtd_minima_produto: updatedProduct.minQuantity
+      qtd_minima_produto: updatedProduct.minQuantity,
     };
 
     const estoqueData = {
       id_estoque: updatedProduct.id_estoque,
       qtde_estoque: updatedProduct.quantity,
-      categoria_estoque: updatedProduct.category
+      categoria_estoque: updatedProduct.category,
     };
+
 
     console.log('Enviando para API:', { produto: produtoData, estoque: estoqueData });
     
