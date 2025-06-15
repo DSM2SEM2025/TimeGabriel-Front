@@ -1,10 +1,17 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-purple-300 px-4 sm:px-6">
-    <div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-md mx-auto">
+  <div
+    class="flex items-center justify-center min-h-screen bg-purple-300 px-4 sm:px-6"
+  >
+    <div
+      class="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-md mx-auto"
+    >
       <div class="flex justify-center mb-6 sm:mb-8">
         <div class="flex items-center">
-          <CubeIcon class="h-6 w-6 sm:h-8 sm:w-8 mr-2 sm:mr-3 text-purple-500" />
-          <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Mini Mercado Ideal</h1>
+          <img src="@/assets/logo_estatica.svg" alt="Logo" class="h-16 w-16
+          sm:h-20 sm:w-20 mr-4 black-logo"/>
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-800">
+            Mini Mercado Ideal
+          </h1>
         </div>
       </div>
 
@@ -43,7 +50,7 @@
           class="w-full bg-purple-400 hover:bg-purple-500 text-white font-medium py-2.5 sm:py-3 rounded-lg transition-colors"
           :loading="isLoading"
         >
-          {{ isLoading ? 'Cadastrando...' : 'Cadastrar' }}
+          {{ isLoading ? "Cadastrando..." : "Cadastrar" }}
         </BaseButton>
 
         <div class="text-center">
@@ -80,7 +87,12 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { CubeIcon, MailIcon, LockClosedIcon, CheckCircleIcon } from "@heroicons/vue/outline";
+import {
+  CubeIcon,
+  MailIcon,
+  LockClosedIcon,
+  CheckCircleIcon,
+} from "@heroicons/vue/outline";
 import BaseInput from "@/components/ui/Login/BaseInput.vue";
 import BaseButton from "@/components/ui/Login/BaseButton.vue";
 
@@ -122,18 +134,23 @@ const handleSubmit = async () => {
   try {
     isLoading.value = true;
     // Aqui você implementaria a chamada para o backend
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulação de chamada API
+    await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulação de chamada API
 
     showSuccessMessage.value = true;
-    
+
     // Redireciona para login após 2 segundos
     setTimeout(() => {
-      router.push('/login');
+      router.push("/login");
     }, 2000);
   } catch (error) {
-    console.error('Erro ao cadastrar:', error);
+    console.error("Erro ao cadastrar:", error);
   } finally {
     isLoading.value = false;
   }
 };
 </script>
+<style scoped>
+.black-logo {
+  filter: brightness(0) saturate(100%);
+}
+</style>
