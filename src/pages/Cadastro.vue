@@ -7,7 +7,7 @@
     >
       <div class="flex justify-center mb-6 sm:mb-8">
         <div class="flex items-center">
-          <img src="@/assets/logo_estatica.svg" alt="Logo" class="h-16 w-16
+          <img src="@/assets/logo.svg" alt="Logo" class="h-16 w-16
           sm:h-20 sm:w-20 mr-4 black-logo"/>
           <h1 class="text-xl sm:text-2xl font-bold text-gray-800">
             Mini Mercado Ideal
